@@ -106,16 +106,3 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
   website kekal Berhenti dengan sebabnya. Butang langkah demi langkah kekal pada kad.
 - Folder web `public` dikesan sendiri jika repo ada `artisan` dan `public/index.php`.
 
-## 2026-10-11 — Halaman jualan dynoseo.my
-
-- Laman utama `dynoseo.my/` ialah halaman jualan (Blade, `resources/views/marketing/home.blade.php`),
-  gaya putih moden dengan aksen emas/biru gelap ikut poster Bob. Isi dari poster: masalah website
-  "mati", 5 ciri, perbandingan Google Ads vs Dyno SEO, harga.
-- **Harga dipaparkan RM49 sebulan** ikut poster Bob (sebelum ini RM59), dari
-  `config('dynoseo.price_myr')` / `DYNOSEO_PRICE_MYR`, satu tempat sahaja.
-- Fasa 0 tiada pendaftaran sendiri: semua butang "Mula" buka WhatsApp syarikat dengan mesej awal.
-- Tidak menyalin dakwaan poster yang tidak boleh dibuktikan ("+RM3,450 jualan", "50% OFF hari ini");
-  FAQ jujur: tiada jaminan nombor 1, SEO ambil 3–6 bulan. Google Ads RM2,000 dilabel "contoh bajet".
-- `robots.txt` benarkan `/` sahaja; `sitemap.xml` untuk laman utama. Imej kongsi sosial
-  `public/images/og-dynoseo.jpg` dipotong dari poster.
-

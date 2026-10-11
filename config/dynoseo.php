@@ -9,9 +9,6 @@ return [
     // so articles are still written if the Forge queue worker is down. See routes/console.php.
     'queue_via_scheduler' => (bool) env('QUEUE_VIA_SCHEDULER', true),
 
-    // Public price on the sales page (RM per website per month).
-    'price_myr' => (int) env('DYNOSEO_PRICE_MYR', 49),
-
     'company' => [
         'name' => env('COMPANY_NAME', 'DynoPOS Technologies'),
         'whatsapp' => env('COMPANY_WHATSAPP', '0182889932'),
