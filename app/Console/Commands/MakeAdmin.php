@@ -14,7 +14,7 @@ class MakeAdmin extends Command
         {email : E-mel admin}
         {--name=Bob : Nama admin}
         {--business=DynoPOS Technologies : Nama workspace admin}
-        {--password= : Kata laluan (untuk Forge Commands yang tidak boleh jawab soalan)}';
+        {--password= : Kata laluan baru (untuk Forge Commands). Akaun sedia ada: kata laluan ditetapkan semula}';
 
     protected $description = 'Cipta atau naikkan akaun admin platform (Bob)';
 
@@ -48,6 +48,19 @@ class MakeAdmin extends Command
                     'password' => $password,
                 ]);
             });
+        }
+
+        // Existing account: --password resets it (e.g. a first attempt with a mistyped password).
+        $reset = $user->wasRecentlyCreated ? '' : (string) $this->option('password');
+        if ($reset !== '') {
+            if (mb_strlen($reset) < 8) {
+                $this->error('Kata laluan mesti sekurang-kurangnya 8 aksara.');
+
+                return self::FAILURE;
+            }
+
+            $user->forceFill(['password' => $reset]);
+            $this->info('Kata laluan dikemas kini.');
         }
 
         $user->forceFill(['is_admin' => true])->save();
