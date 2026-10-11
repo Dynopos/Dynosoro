@@ -90,3 +90,8 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
   akar repo. App tidak urus `sitemap.xml`/`robots.txt` untuk app Laravel (itu route).
 - Dyno Lead dikemas kini supaya `robots.txt` benarkan `/blog/` dan sebut `/blog/sitemap.xml`,
   dan footer ada pautan Blog.
+
+## 2026-10-11 — Domain sendiri
+
+- **App di `dynoseo.my`** (Bob beli domain), menggantikan `seo.dynolead.my`. `www` dan
+  `*.on-forge.com` dialih 301 ke `dynoseo.my` oleh `RedirectToCanonicalHost`.

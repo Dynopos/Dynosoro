@@ -326,7 +326,7 @@ atau tukar pembekal.
 
 ## 11. Keputusan Bob (11 Oktober 2026)
 
-1. **Domain app: `seo.dynolead.my`** (subdomain dynolead.my, tiada domain baru). Artikel
+1. **Domain app: `dynoseo.my`** (domain sendiri, dibeli Bob 11 Oktober 2026; asalnya `seo.dynolead.my`). Artikel
    tetap tinggal dalam website pelanggan; subdomain ini hanya untuk panel admin Bob
    (Fasa 0) dan portal pelanggan (Fasa 1).
 2. **Harga: langganan RM59 sebulan** setiap website (kos AI ± RM6/bulan). Fasa 0: Bob kutip

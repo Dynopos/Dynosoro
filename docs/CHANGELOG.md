@@ -27,6 +27,7 @@ Enjin Dyno SEO untuk Bob (admin sahaja). Belum diuji dengan Vertex AI dan GitHub
   peraturan dalam CLAUDE.md.
 - Panduan pasang: `docs/DEPLOY.md`.
 - Sokongan website Laravel (Folder web `public`), untuk ujian pertama di dynolead.my.
+- Domain app: `dynoseo.my`.
 
 ## Spec v0.1 — 2026-10-11
 

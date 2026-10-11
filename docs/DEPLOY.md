@@ -45,8 +45,9 @@ Setiap kali tambah website baru: GitHub → token `dynoseo` → *Edit* → tamba
 
 Pelayan `dynosoro`: PHP **8.3**, MySQL 8, Node 20+.
 
-1. **DNS:** di pengurus domain `dynolead.my`, tambah rekod **A** `seo` → IP pelayan `dynosoro`.
-2. Forge → *Sites → New Site*: domain `seo.dynolead.my`, Laravel, web directory `/public`,
+1. **DNS:** di pengurus domain `dynoseo.my`, tambah rekod **A** `@` → IP pelayan Forge, dan
+   **CNAME** `www` → `dynoseo.my`.
+2. Forge → *Sites → New Site*: domain `dynoseo.my` (tambah `www.dynoseo.my` sebagai alias), Laravel, web directory `/public`,
    tanda *Create database* `dynoseo`.
 3. *Git Repository*: GitHub → **`Dynopos/Dynosoro`**, branch `main`.
 4. *SSL* → Let's Encrypt.
@@ -57,7 +58,7 @@ Site → *Environment*. Mula dari `.env.example`:
 
 | Pembolehubah | Nilai |
 |---|---|
-| `APP_URL` | `https://seo.dynolead.my` |
+| `APP_URL` | `https://dynoseo.my` |
 | `APP_ENV` / `APP_DEBUG` | `production` / `false` |
 | `DB_*` | Dari Forge |
 | `MAIL_*` | SMTP (untuk e-mel amaran dan lupa kata laluan) |
@@ -126,7 +127,7 @@ Forge → site → *Commands*:
 php artisan dynoseo:admin borhanlimapos@gmail.com --password="KATA-LALUAN-ANDA"
 ```
 
-Masuk di `https://seo.dynolead.my/masuk`. Tukar kata laluan kemudian melalui "Lupa kata
+Masuk di `https://dynoseo.my/masuk`. Tukar kata laluan kemudian melalui "Lupa kata
 laluan" jika mahu (kata laluan itu kelihatan dalam sejarah Forge Commands).
 
 ## 6. Queue worker
@@ -140,7 +141,7 @@ tiada kos AI berganda.
 
 ## 7. Scheduler
 
-Pelayan → *Scheduler → New Scheduled Job*: `php /home/forge/seo.dynolead.my/artisan schedule:run`
+Pelayan → *Scheduler → New Scheduled Job*: `php /home/forge/<nama-site>/artisan schedule:run`
 (atau `.../current/artisan` untuk site zero-downtime),
 user `forge`, **Every Minute**.
 
