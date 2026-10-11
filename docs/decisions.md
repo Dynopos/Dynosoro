@@ -31,3 +31,53 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
   manual (`paid_until`), CHIP dalam Fasa 2.
 - **Pelayan Forge baru** untuk Dyno SEO, berasingan dari Dyno Lead.
 - **dynopos.my kekal dengan Soro**; Dyno SEO tidak sentuh repo itu.
+
+## 2026-10-11 — Fasa 0 (enjin + admin)
+
+- **Laravel 12 + Livewire 3**, asas disalin dari Dyno Lead (login, `BelongsToWorkspace`,
+  `CurrentWorkspace`, susun atur telefon). Tiada daftar akaun: admin dicipta dengan
+  `php artisan dynoseo:admin`.
+- **Semua website Fasa 0 dalam workspace dalaman Bob.** Setiap jadual tetap ada
+  `workspace_id` dan job berjalan dalam workspace website (`runAs`), supaya Fasa 1 boleh
+  pindah website ke workspace pelanggan tanpa ubah model data.
+- **Model lalai:** `gemini-2.5-flash` (tulis), `gemini-2.5-flash-lite` (pelan topik dan
+  semakan), `imagen-4.0-fast-generate-001` (gambar). Murah dan cukup untuk artikel umum.
+  Harga dalam `config/ai_prices.php` diisi dari harga senarai Google yang diketahui;
+  **Bob mesti semak semula sebelum hidupkan** (harga dan model Vertex selalu berubah).
+  Model tanpa harga tidak akan dipanggil.
+- **Kunci service account dalam `.env` sebagai base64** (`GOOGLE_CREDENTIALS_BASE64`).
+  App dihos di Forge, bukan GCP, jadi Secret Manager tidak terpakai; `.env` di Forge ialah
+  tempat rahsia (peraturan 7). Fail kunci di luar repo juga disokong. Service account hanya
+  ada peranan Vertex AI User.
+- **Had:** `AI_MONTHLY_BUDGET_MYR` (RM300) dan `MAX_DAILY_AI_CALLS` (300) untuk semua
+  website; satu artikel sehari setiap website; tulis semula maksimum 2 kali; gambar
+  maksimum 2 cubaan. Anggaran kos dikira sebelum setiap panggilan (input ≈ aksara/3,
+  output = had penuh).
+- **Kegagalan:** job tidak diulang oleh queue (`tries = 1`). App cuba semula 3 jam kemudian
+  dan tanda website "Ralat" selepas 3 kegagalan berturut-turut, dengan e-mel kepada Bob.
+  Ralat billing Vertex (403 billing) tangguh **semua** website ("Tertunda (AI)") dan e-mel
+  sekali; Bob tekan "Sambung semula semua" selepas betulkan.
+- **Artikel yang sudah ditulis tetapi gagal diterbitkan** (contoh GitHub ralat) diterbitkan
+  dahulu pada larian seterusnya, tanpa kos AI baru.
+- **Website baru bermula "Berhenti".** Bob perlu Semak repo → Pasang blog → Aktifkan.
+- **Template:** lalai dalam `resources/site-template/`, disalin ke `_dynoseo/` dalam repo
+  website semasa pasang. Jika `_dynoseo/*.html` wujud, app guna versi repo itu (supaya blog
+  ikut reka bentuk website). Jekyll GitHub Pages abaikan folder bermula `_`.
+- **Laman utama** hanya diubah jika ada penanda `<!-- dynoseo:latest -->...<!-- /dynoseo:latest -->`.
+  App tidak sesekali menambah penanda itu sendiri. `RepoGuard` semak setiap commit: fail
+  hanya dalam `blog/`, `_dynoseo/`, `sitemap.xml`, `sitemap-pages.xml`, `robots.txt`,
+  `index.html` (dalam penanda sahaja) dan fail kunci IndexNow.
+- **Sitemap:** `blog/sitemap.xml` untuk artikel. Semasa pasang, `sitemap.xml` asal website
+  dipindah ke `sitemap-pages.xml` dan `sitemap.xml` jadi sitemap index (jika sudah index,
+  satu entri ditambah). Halaman senarai blog 2 dan seterusnya `noindex, follow`.
+- **Google tidak lagi terima ping sitemap**; app hantar IndexNow (Bing/Yandex) sahaja.
+  Google jumpa artikel melalui sitemap di Search Console.
+- **Semakan kod (peraturan 2) sengaja ketat:** sebarang peratus, kod piawaian (JKR, MS,
+  ISO, ASTM, SIRIM), akta/seksyen, dan "kajian/laporan menunjukkan" ditolak. Lebih baik
+  tulis semula daripada terbit fakta rekaan.
+- **Topik berulang (peraturan 8):** kata kunci dibandingkan selepas dinormalkan (huruf kecil,
+  ASCII, tanpa kata hubung, perkataan disusun), jadi "gabion wall vs concrete wall" dan
+  "Concrete Wall vs Gabion Wall" dikira sama.
+- **Halaman Topik dicari dalam komponen** (`/website/{siteId}/topik`), bukan route model
+  binding, supaya skop workspace sentiasa terpakai.
+- **Penulis artikel** dipaparkan sebagai "Pasukan <Nama bisnes>" (schema `Organization`).

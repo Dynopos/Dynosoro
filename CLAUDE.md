@@ -21,7 +21,7 @@ Pemilik produk: Bob (Borhan Sidqy). Fasa 0 untuk Bob (admin) sahaja.
 
 ## Stack
 
-- Laravel 11 (atau 12), Livewire 3, Blade, Tailwind, MySQL, Pest
+- Laravel 12, Livewire 3, Blade, Tailwind, MySQL, Pest
 - Queue: database driver. Scheduler: `php artisan schedule:run` melalui cron Forge
 - Hosting app: Laravel Forge. Website pelanggan: GitHub Pages (bukan app ini)
 - AI: Google Vertex AI (Gemini teks, Imagen gambar), dibayar kredit GCP Free Trial

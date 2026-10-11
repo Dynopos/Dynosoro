@@ -1,0 +1,156 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Enums\SiteStatus;
+use App\Models\Site;
+use App\Services\Sites\SiteService;
+use Carbon\Carbon;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+use Throwable;
+
+#[Layout('components.layouts.app')]
+#[Title('Website')]
+class SitesPage extends Component
+{
+    public bool $showForm = false;
+
+    public ?int $editingId = null;
+
+    public array $form = [];
+
+    public ?string $flash = null;
+
+    public ?string $flashType = null;
+
+    public function create(): void
+    {
+        $this->editingId = null;
+        $this->form = SiteService::form();
+        $this->showForm = true;
+        $this->resetErrorBag();
+    }
+
+    public function edit(int $id): void
+    {
+        $site = Site::query()->findOrFail($id);
+        $this->editingId = $site->id;
+        $this->form = SiteService::form($site);
+        $this->showForm = true;
+        $this->resetErrorBag();
+    }
+
+    public function cancel(): void
+    {
+        $this->showForm = false;
+        $this->editingId = null;
+    }
+
+    public function save(SiteService $sites): void
+    {
+        $rules = collect(SiteService::rules())->mapWithKeys(fn ($rule, $key) => ['form.'.$key => $rule])->all();
+        $messages = collect(SiteService::messages())->mapWithKeys(fn ($m, $key) => [str_contains($key, '.') ? 'form.'.$key : $key => $m])->all();
+        $data = $this->validate($rules, $messages)['form'];
+
+        $site = $sites->save($data, $this->editingId ? Site::query()->findOrFail($this->editingId) : null);
+
+        $this->showForm = false;
+        $this->editingId = null;
+        $this->say($site->wasRecentlyCreated
+            ? "Website {$site->name} disimpan. Tekan Semak repo, kemudian Pasang blog dan Aktifkan."
+            : "Website {$site->name} dikemas kini. Tekan Bina semula jika hook berubah.");
+    }
+
+    public function check(SiteService $sites, int $id): void
+    {
+        $site = Site::query()->findOrFail($id);
+        $problem = $sites->check($site);
+
+        $problem === null
+            ? $this->say("Repo {$site->github_repo} OK: boleh tulis ke branch {$site->branch}.")
+            : $this->say($problem, 'danger');
+    }
+
+    public function install(SiteService $sites, int $id): void
+    {
+        $this->attempt(fn () => $sites->install(Site::query()->findOrFail($id)), 'Blog dipasang: template, sitemap dan robots.txt dah di-commit.');
+    }
+
+    public function activate(SiteService $sites, int $id): void
+    {
+        $site = Site::query()->findOrFail($id);
+
+        if (! $site->installed_at) {
+            $this->say('Pasang blog dahulu sebelum aktifkan.', 'warning');
+
+            return;
+        }
+
+        $sites->activate($site);
+        $this->say("{$site->name} aktif. Artikel pertama akan ditulis dalam 15 minit.");
+    }
+
+    public function pause(SiteService $sites, int $id): void
+    {
+        $sites->pause(Site::query()->findOrFail($id));
+        $this->say('Website diberhentikan. Tiada artikel baru sehingga diaktifkan semula.');
+    }
+
+    public function publishNow(SiteService $sites, int $id): void
+    {
+        $site = Site::query()->findOrFail($id);
+
+        if (! $site->installed_at) {
+            $this->say('Pasang blog dahulu.', 'warning');
+
+            return;
+        }
+
+        $sites->publishNow($site);
+        $this->say('Artikel sedang ditulis. Semak skrin Artikel dalam beberapa minit.');
+    }
+
+    public function rebuild(SiteService $sites, int $id): void
+    {
+        $this->attempt(fn () => $sites->rebuild(Site::query()->findOrFail($id)), 'Semua halaman blog dibina semula.');
+    }
+
+    public function resumeAi(SiteService $sites): void
+    {
+        $count = $sites->resumeAiPaused();
+        $this->say("{$count} website disambung semula.");
+    }
+
+    private function attempt(callable $action, string $success): void
+    {
+        try {
+            $action();
+            $this->say($success);
+        } catch (Throwable $e) {
+            report($e);
+            $this->say($e->getMessage(), 'danger');
+        }
+    }
+
+    private function say(string $message, string $type = 'success'): void
+    {
+        $this->flash = $message;
+        $this->flashType = $type;
+    }
+
+    public function render()
+    {
+        $expires = config('dynoseo.github.token_expires_at');
+
+        return view('livewire.sites-page', [
+            'sites' => Site::query()->withCount([
+                'articles as published_count' => fn ($q) => $q->where('status', 'published'),
+                'topics as planned_count' => fn ($q) => $q->where('status', 'planned'),
+            ])->orderBy('name')->get(),
+            'aiPaused' => Site::query()->where('status', SiteStatus::AiPaused)->count(),
+            'tokenExpires' => $expires ? Carbon::parse($expires) : null,
+        ]);
+    }
+}
