@@ -106,3 +106,9 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
   website kekal Berhenti dengan sebabnya. Butang langkah demi langkah kekal pada kad.
 - Folder web `public` dikesan sendiri jika repo ada `artisan` dan `public/index.php`.
 
+
+## 2026-10-11 — Halaman jualan ditangguh
+
+- Bob mahu reka bentuk halaman jualan dengan ChatGPT dahulu. Draf pertama (RM49/bulan, butang
+  WhatsApp, FAQ, schema) diberi sebagai satu fail HTML dan dikeluarkan dari app (commit revert).
+  Laman utama kekal alih ke log masuk sehingga reka bentuk baru dipasang.
