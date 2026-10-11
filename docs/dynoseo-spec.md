@@ -44,7 +44,7 @@ pakej website RM200.
 |---|---|---|
 | **0** | Enjin: daftar website, pelan topik, tulis artikel + gambar, semakan, terbit ke GitHub setiap 2 hari, hook bawah artikel, skrin admin, had kos | Bob sahaja |
 | **1** | Portal pelanggan: lihat artikel, edit/padam, tulis artikel sendiri (+ "Kemaskan dengan AI"), suis berhenti, ubah hook | Pelanggan |
-| **2** | Bayaran (CHIP), Search Console (topik dari carian sebenar + laporan bulanan) | Pelanggan |
+| **2** | Langganan RM59/bulan (CHIP), Search Console (topik dari carian sebenar + laporan bulanan) | Pelanggan |
 | **3** | Pilihan: WordPress, jual kepada agensi lain | — |
 
 Bina ikut fasa. Fasa seterusnya hanya bermula atas arahan Bob.
@@ -324,11 +324,16 @@ atau tukar pembekal.
 - [ ] Ralat GitHub / Vertex tidak buat loop; website ditanda Ralat dan Bob dimaklumkan.
 - [ ] `php artisan test` lulus; tiada test panggil API sebenar.
 
-## 11. Soalan terbuka (untuk Bob)
+## 11. Keputusan Bob (11 Oktober 2026)
 
-1. **Domain/subdomain app**: contoh `seo.dynolead.my` atau domain baru?
-2. **Harga Dyno SEO** sebulan untuk pelanggan (kos ± RM6/website/bulan)? Cara bayar Fasa 0:
-   Bob kutip manual dan isi `paid_until`?
-3. **Website pertama untuk ujian**: yang mana (repo apa)?
-4. **Pelayan**: guna pelayan Forge yang sama dengan Dyno Lead?
-5. Website lama yang guna Soro: pindahkan artikel lama ke `/blog/` atau biar?
+1. **Domain app: `seo.dynolead.my`** (subdomain dynolead.my, tiada domain baru). Artikel
+   tetap tinggal dalam website pelanggan; subdomain ini hanya untuk panel admin Bob
+   (Fasa 0) dan portal pelanggan (Fasa 1).
+2. **Harga: langganan RM59 sebulan** setiap website (kos AI ± RM6/bulan). Fasa 0: Bob kutip
+   manual dan isi `paid_until`. Fasa 2: langganan automatik melalui CHIP.
+3. **Pelayan: pelayan Forge baru**, berasingan dari Dyno Lead.
+4. **dynopos.my kekal guna Soro.** Dyno SEO tidak menyentuh repo atau artikel dynopos.my.
+
+## 12. Soalan terbuka
+
+1. **Website pertama untuk ujian**: repo GitHub yang mana? (bukan dynopos.my)

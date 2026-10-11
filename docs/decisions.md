@@ -22,3 +22,12 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
 - **Risiko yang Bob terima:** polisi Google "scaled content abuse" boleh kurangkan ranking
   artikel AI umum. Dikurangkan dengan kekerapan sederhana (2 hari), semakan kualiti, topik
   tidak berulang, dan pautan dalaman.
+
+## 2026-10-11 — Jawapan Bob
+
+- **Panel app di `seo.dynolead.my`.** Artikel tinggal dalam website pelanggan, tetapi enjin,
+  panel admin dan portal pelanggan perlukan alamat. Subdomain dynolead.my: tiada kos domain baru.
+- **Langganan RM59 sebulan setiap website.** Kos AI anggaran ± RM6/bulan. Fasa 0 bayaran
+  manual (`paid_until`), CHIP dalam Fasa 2.
+- **Pelayan Forge baru** untuk Dyno SEO, berasingan dari Dyno Lead.
+- **dynopos.my kekal dengan Soro**; Dyno SEO tidak sentuh repo itu.
