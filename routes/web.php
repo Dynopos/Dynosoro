@@ -10,10 +10,25 @@ use App\Livewire\TopicsPage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// The app is private: nothing here should be indexed.
-Route::get('/robots.txt', fn () => response("User-agent: *\nDisallow: /\n")->header('Content-Type', 'text/plain'));
+// Public sales page. Everything else (the app) stays out of search engines.
+Route::view('/', 'marketing.home')->name('home');
 
-Route::redirect('/', '/website');
+Route::get('/robots.txt', fn () => response(implode("\n", [
+    'User-agent: *',
+    'Allow: /$',
+    'Allow: /images/',
+    'Disallow: /',
+    '',
+    'Sitemap: '.url('/sitemap.xml'),
+    '',
+]))->header('Content-Type', 'text/plain'))->name('robots');
+
+Route::get('/sitemap.xml', fn () => response(
+    '<?xml version="1.0" encoding="UTF-8"?>'."\n"
+    .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n"
+    .'  <url><loc>'.e(url('/')).'</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>'."\n"
+    .'</urlset>'."\n"
+)->header('Content-Type', 'application/xml'))->name('sitemap');
 
 Route::middleware('guest')->group(function () {
     Route::get('/masuk', Login::class)->name('login');
