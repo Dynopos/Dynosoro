@@ -81,3 +81,12 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
 - **Halaman Topik dicari dalam komponen** (`/website/{siteId}/topik`), bukan route model
   binding, supaya skop workspace sentiasa terpakai.
 - **Penulis artikel** dipaparkan sebagai "Pasukan <Nama bisnes>" (schema `Organization`).
+
+## 2026-10-11 — Website ujian pertama: dynolead.my
+
+- **dynolead.my ialah app Laravel di Forge, bukan GitHub Pages.** Ditambah medan `docroot`
+  pada website: kosong untuk GitHub Pages, `public` untuk app Laravel. Semua laluan web
+  (blog, gambar, kunci IndexNow) dipetakan ke `public/`; template kekal di `_dynoseo/` pada
+  akar repo. App tidak urus `sitemap.xml`/`robots.txt` untuk app Laravel (itu route).
+- Dyno Lead dikemas kini supaya `robots.txt` benarkan `/blog/` dan sebut `/blog/sitemap.xml`,
+  dan footer ada pautan Blog.

@@ -26,6 +26,7 @@ Enjin Dyno SEO untuk Bob (admin sahaja). Belum diuji dengan Vertex AI dan GitHub
 - 77 test Pest (semua API dipalsukan), termasuk sekurang-kurangnya satu test untuk setiap
   peraturan dalam CLAUDE.md.
 - Panduan pasang: `docs/DEPLOY.md`.
+- Sokongan website Laravel (Folder web `public`), untuk ujian pertama di dynolead.my.
 
 ## Spec v0.1 — 2026-10-11
 

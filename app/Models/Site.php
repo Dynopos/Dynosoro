@@ -14,7 +14,7 @@ class Site extends Model
     use BelongsToWorkspace, HasFactory;
 
     protected $fillable = [
-        'name', 'domain', 'github_repo', 'branch', 'niche', 'audience', 'area', 'banned_topics',
+        'name', 'domain', 'github_repo', 'branch', 'docroot', 'niche', 'audience', 'area', 'banned_topics',
         'frequency_days', 'status', 'status_note', 'failure_count', 'next_publish_at',
         'last_published_at', 'paid_until', 'cta', 'cta_bridge', 'installed_at', 'blog_pages',
     ];
@@ -56,6 +56,23 @@ class Site extends Model
     public function host(): string
     {
         return (string) parse_url($this->baseUrl(), PHP_URL_HOST);
+    }
+
+    /**
+     * Repo path for a path in the web root. GitHub Pages serves the repo root; a Laravel
+     * app serves public/. Templates (_dynoseo/) always live at the repo root.
+     */
+    public function repoPath(string $path): string
+    {
+        $docroot = trim((string) $this->docroot, '/');
+
+        return $docroot === '' || str_starts_with($path, '_dynoseo/') ? $path : $docroot.'/'.$path;
+    }
+
+    /** GitHub Pages: the repo root is the web root, so sitemap.xml and robots.txt are files we may manage. */
+    public function ownsRootFiles(): bool
+    {
+        return trim((string) $this->docroot, '/') === '';
     }
 
     /** Paid (or never billed, e.g. Bob's own sites) within the grace period. */

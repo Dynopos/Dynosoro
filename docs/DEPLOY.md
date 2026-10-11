@@ -156,6 +156,21 @@ user `forge`, **Every Minute**.
    rawak 8 pagi – 9 malam. **Terbit sekarang** untuk ujian segera.
 8. Google: tambah domain di Google Search Console dan hantar `https://domain/sitemap.xml`.
 
+### 8b. Website Laravel di Forge (contoh dynolead.my)
+
+App Laravel dihidangkan dari folder `public/`, jadi isi **Folder web** = `public` di borang
+website. Artikel ditulis ke `public/blog/...` dan nginx Forge terus hidangkan fail statik itu
+di `https://domain/blog/`. App tidak sentuh `sitemap.xml` dan `robots.txt` (itu route Laravel);
+app tersebut sendiri mesti benarkan `/blog/` dalam robots.txt dan sebut
+`/blog/sitemap.xml` (sudah dibuat untuk Dyno Lead).
+
+- Token GitHub perlu akses tulis ke repo app itu (contoh `Dynopos/Dynolead`). RepoGuard hanya
+  benarkan `public/blog/`, `_dynoseo/` dan fail kunci IndexNow.
+- Setiap artikel ialah satu commit ke branch `main` app itu. Jika *Quick Deploy* hidup di
+  Forge, app itu deploy semula setiap kali artikel terbit (dua hari sekali). Itu dijangka.
+- Blok "Artikel terkini" di laman utama tidak disokong untuk app Laravel (laman utama ialah
+  Blade, bukan `index.html`).
+
 ## 9. Bayaran (Fasa 0, manual)
 
 Langganan RM59 sebulan setiap website. Bob kutip sendiri dan isi **Bayar sehingga** di

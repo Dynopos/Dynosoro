@@ -121,3 +121,27 @@ it('refills the topic plan only when fewer than five topics are left', function 
     expect(vertexRequests('plan'))->toHaveCount(0)
         ->and($site->topics()->where('status', 'used')->count())->toBe(1);
 });
+
+it('publishes into public/ for a Laravel website and leaves its sitemap and robots alone', function () {
+    $github = fakeGitHub([]);
+    $site = makeSite(['docroot' => 'public', 'installed_at' => null, 'domain' => 'dynolead.my']);
+    $github->repos[$site->github_repo] = ['routes/web.php' => '<?php // app', 'public/index.php' => '<?php'];
+    fakeVertex(github: $github);
+
+    PublishSiteArticle::dispatchSync($site->id);
+
+    $repo = $github->repos[$site->github_repo];
+    $paths = collect($github->commits)->pluck('paths')->flatten();
+
+    expect($repo)->toHaveKeys([
+        'public/blog/gabion-wall-vs-concrete-wall/index.html',
+        'public/blog/img/gabion-wall-vs-concrete-wall.webp',
+        'public/blog/index.html',
+        'public/blog/sitemap.xml',
+        'public/blog/assets/dynoseo.css',
+        '_dynoseo/article.html',
+    ])
+        ->and($paths->reject(fn ($p) => str_starts_with($p, 'public/blog/') || str_starts_with($p, '_dynoseo/'))->all())->toBe([])
+        ->and($repo['routes/web.php'])->toBe('<?php // app')
+        ->and($repo['public/blog/gabion-wall-vs-concrete-wall/index.html'])->toContain('https://dynolead.my/blog/gabion-wall-vs-concrete-wall/');
+});

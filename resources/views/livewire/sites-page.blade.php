@@ -42,6 +42,10 @@
                 </x-field>
             </div>
 
+            <x-field label="Folder web (pilihan)" name="form.docroot" hint="Kosong untuk GitHub Pages. Isi public untuk app Laravel (contoh dynolead.my).">
+                <input type="text" wire:model="form.docroot" class="input" placeholder="public" autocapitalize="none">
+            </x-field>
+
             <p class="label pt-2">Artikel</p>
             <x-field label="Bidang" name="form.niche" hint="Topik umum artikel. Contoh: gabion, kawalan cerun, tembok penahan tanah">
                 <textarea wire:model="form.niche" rows="2" class="input"></textarea>

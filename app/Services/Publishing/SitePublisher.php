@@ -41,7 +41,30 @@ class SitePublisher
 
         $files['blog/assets/dynoseo.css'] = SiteTemplates::css();
 
+        // A Laravel app serves its own sitemap.xml and robots.txt (routes): leave them alone.
+        if ($site->ownsRootFiles()) {
+            $files += $this->rootSitemapAndRobots($site);
+        }
+
+        $key = (string) config('dynoseo.indexnow_key');
+        if ($key !== '') {
+            $files[$key.'.txt'] = $key;
+        }
+
+        $files += $this->listingFiles($site, SiteTemplates::load($site, $this->github), $this->published($site));
+
+        $sha = $this->commit($site, null, 'install', $files, 'Dyno SEO: pasang blog');
+        $site->forceFill(['installed_at' => now()])->save();
+
+        return $sha;
+    }
+
+    /** @return array<string, string> */
+    private function rootSitemapAndRobots(Site $site): array
+    {
+        $files = [];
         $sitemap = $this->github->getFile($site->github_repo, $site->branch, 'sitemap.xml');
+
         if ($sitemap === null || ! str_contains($sitemap['content'], 'blog/sitemap.xml')) {
             if ($sitemap !== null && str_contains($sitemap['content'], '</sitemapindex>')) {
                 // Already an index: add the blog sitemap to it.
@@ -64,17 +87,7 @@ class SitePublisher
             $files['robots.txt'] = rtrim($robots['content'])."\n\n{$sitemapLine}\n";
         }
 
-        $key = (string) config('dynoseo.indexnow_key');
-        if ($key !== '') {
-            $files[$key.'.txt'] = $key;
-        }
-
-        $files += $this->listingFiles($site, SiteTemplates::load($site, $this->github), $this->published($site));
-
-        $sha = $this->commit($site, null, 'install', $files, 'Dyno SEO: pasang blog');
-        $site->forceFill(['installed_at' => now()])->save();
-
-        return $sha;
+        return $files;
     }
 
     /** Publish a ready article (rule 3: with the hook), then refresh index, sitemap, feed, home block. */
@@ -208,7 +221,7 @@ class SitePublisher
         $files['blog/sitemap.xml'] = $this->renderer->sitemap($site, $published);
         $files['blog/feed.xml'] = $this->renderer->feed($site, $published);
 
-        $home = $this->github->getFile($site->github_repo, $site->branch, 'index.html');
+        $home = $this->github->getFile($site->github_repo, $site->branch, $site->repoPath('index.html'));
         if ($home !== null && RepoGuard::hasBlock($home['content'])) {
             $latest = $published->take((int) config('dynoseo.articles.home_cards'));
             $files['index.html'] = RepoGuard::replaceBlock($home['content'], $this->renderer->homeBlock($site, $latest, $templates));
@@ -226,6 +239,9 @@ class SitePublisher
         $this->originalHome = null;
 
         RepoGuard::assertAllowed($files, $original);
+
+        // Paths above are relative to the web root; map them into the repo (e.g. public/).
+        $files = collect($files)->mapWithKeys(fn ($content, $path) => [$site->repoPath((string) $path) => $content])->all();
 
         try {
             $sha = $this->github->commit($site->github_repo, $site->branch, $files, Str::limit($message, 120));

@@ -27,6 +27,7 @@ class SiteService
             'domain' => ['required', 'string', 'max:190', 'regex:/^(https?:\/\/)?[a-z0-9.-]+\.[a-z]{2,}\/?$/i'],
             'github_repo' => ['required', 'string', 'max:190', 'regex:/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/'],
             'branch' => 'required|string|max:100',
+            'docroot' => ['nullable', 'string', 'max:50', 'regex:/^[A-Za-z0-9_-]*$/'],
             'niche' => 'required|string|max:500',
             'audience' => 'nullable|string|max:500',
             'area' => 'nullable|string|max:190',
@@ -49,6 +50,7 @@ class SiteService
             'required' => 'Wajib diisi.',
             'domain.regex' => 'Contoh: gabionpantaitimur.my',
             'github_repo.regex' => 'Format: pemilik/nama-repo, contoh Dynopos/gabion-pantai-timur',
+            'docroot.regex' => 'Nama folder sahaja, contoh public.',
             'cta_url.regex' => 'Mula dengan / (contoh /hubungi/) atau https://',
         ];
     }
@@ -63,6 +65,7 @@ class SiteService
             'domain' => $site?->domain ?? '',
             'github_repo' => $site?->github_repo ?? '',
             'branch' => $site?->branch ?? 'main',
+            'docroot' => $site?->docroot ?? '',
             'niche' => $site?->niche ?? '',
             'audience' => $site?->audience ?? '',
             'area' => $site?->area ?? '',
@@ -91,6 +94,7 @@ class SiteService
             'domain' => Str::lower(rtrim(preg_replace('#^https?://#i', '', trim($data['domain'])), '/')),
             'github_repo' => trim($data['github_repo']),
             'branch' => trim($data['branch']),
+            'docroot' => trim((string) ($data['docroot'] ?? ''), '/ '),
             'niche' => trim($data['niche']),
             'audience' => trim((string) ($data['audience'] ?? '')) ?: null,
             'area' => trim((string) ($data['area'] ?? '')) ?: null,
