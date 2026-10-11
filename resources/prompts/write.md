@@ -1,4 +1,4 @@
-prompt_version: write-v1
+prompt_version: write-v2
 
 ## SYSTEM
 
@@ -40,7 +40,7 @@ Jawab dalam JSON sahaja.
 
 ## USER
 
-Bidang website: {{niche}}
+Bisnes pemilik website (kenal pasti bidangnya; artikel UMUM tentang bidang itu, bukan tentang bisnes ini): {{niche}}
 Pembaca sasaran: {{audience}}
 Kawasan pembaca: {{area}}
 Topik dilarang: {{banned}}

@@ -1,4 +1,4 @@
-prompt_version: check-v1
+prompt_version: check-v2
 
 ## SYSTEM
 
@@ -20,7 +20,7 @@ Melayu yang menerangkan apa perlu dibetulkan. Jawab dalam JSON sahaja.
 
 ## USER
 
-Bidang website: {{niche}}
+Bisnes pemilik website (kenal pasti bidangnya; artikel UMUM tentang bidang itu, bukan tentang bisnes ini): {{niche}}
 
 Tajuk artikel lama:
 {{existing}}

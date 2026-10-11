@@ -29,7 +29,7 @@ it('sends guests to the login page', function () {
     $this->get('/masuk')->assertOk()->assertSee('Masuk');
 });
 
-it('adds a website paused, then installs and activates it', function () {
+it('sets up a new website in one step from five fields', function () {
     $github = fakeGitHub(['Dynopos/gabion' => siteRepo()]);
     fakeVertex(github: $github);
     actingAsAdmin();
@@ -37,19 +37,68 @@ it('adds a website paused, then installs and activates it', function () {
     Livewire::test(SitesPage::class)
         ->call('create')
         ->set('form.name', 'Gabion Pantai Timur')
+        ->set('form.niche', 'Pasang gabion dan tembok penahan cerun di Kelantan')
         ->set('form.domain', 'https://GabionPantaiTimur.my/')
         ->set('form.github_repo', 'Dynopos/gabion')
-        ->set('form.niche', 'gabion, kawalan cerun')
-        ->set('form.cta_title', 'Cerun mula runtuh?')
-        ->set('form.cta_text', 'WhatsApp kami.')
         ->set('form.cta_whatsapp', '012-345 6789')
         ->call('save')
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertSee('siap dan aktif');
 
     $site = Site::query()->sole();
-    expect($site->status)->toBe(SiteStatus::Paused)
+    expect($site->status)->toBe(SiteStatus::Active)
+        ->and($site->installed_at)->not->toBeNull()
         ->and($site->domain)->toBe('gabionpantaitimur.my')
-        ->and($site->cta['whatsapp'])->toBe('012-345 6789');
+        ->and($site->docroot)->toBe('')
+        ->and($site->cta['title'])->toBe('Berminat dengan Gabion Pantai Timur?')
+        ->and($site->cta['button'])->toBe('💬 WhatsApp Kami')
+        ->and($site->cta['whatsapp'])->toBe('012-345 6789')
+        ->and($github->file('Dynopos/gabion', 'blog/index.html'))->toContain('Blog Gabion Pantai Timur');
+});
+
+it('detects a Laravel app and writes the blog into public/', function () {
+    $github = fakeGitHub(['Dynopos/Dynolead' => ['artisan' => '#!/usr/bin/env php', 'public/index.php' => '<?php']]);
+    fakeVertex(github: $github);
+    actingAsAdmin();
+
+    Livewire::test(SitesPage::class)
+        ->call('create')
+        ->set('form.name', 'Dyno Lead')
+        ->set('form.niche', 'App cari pelanggan untuk SME')
+        ->set('form.domain', 'dynolead.my')
+        ->set('form.github_repo', 'Dynopos/Dynolead')
+        ->set('form.cta_whatsapp', '0182889932')
+        ->call('save')
+        ->assertSee('siap dan aktif');
+
+    expect(Site::query()->sole()->docroot)->toBe('public')
+        ->and($github->file('Dynopos/Dynolead', 'public/blog/index.html'))->not->toBeNull()
+        ->and($github->file('Dynopos/Dynolead', 'blog/index.html'))->toBeNull();
+});
+
+it('keeps a new website paused when the repo is not reachable', function () {
+    $github = fakeGitHub([]);
+    fakeVertex(github: $github);
+    actingAsAdmin();
+
+    Livewire::test(SitesPage::class)
+        ->call('create')
+        ->set('form.name', 'Kedai X')
+        ->set('form.niche', 'Kedai runcit')
+        ->set('form.domain', 'kedaix.my')
+        ->set('form.github_repo', 'Dynopos/tiada')
+        ->set('form.cta_whatsapp', '0123456789')
+        ->call('save')
+        ->assertSee('belum aktif');
+
+    expect(Site::query()->sole()->status)->toBe(SiteStatus::Paused);
+});
+
+it('still installs and activates step by step from the website card', function () {
+    $github = fakeGitHub(['Dynopos/gabion' => siteRepo()]);
+    fakeVertex(github: $github);
+    $site = Site::factory()->create(['github_repo' => 'Dynopos/gabion', 'status' => 'paused', 'installed_at' => null]);
+    actingAsAdmin();
 
     Livewire::test(SitesPage::class)
         ->call('activate', $site->id)->assertSee('Pasang blog dahulu')
@@ -57,8 +106,7 @@ it('adds a website paused, then installs and activates it', function () {
         ->call('install', $site->id)->assertSee('Blog dipasang')
         ->call('activate', $site->id)->assertSee('aktif');
 
-    expect($site->fresh()->status)->toBe(SiteStatus::Active)
-        ->and($github->file('Dynopos/gabion', 'blog/index.html'))->toContain('Blog Gabion Pantai Timur');
+    expect($site->fresh()->status)->toBe(SiteStatus::Active);
 });
 
 it('requires a mobile WhatsApp number or a link for the hook', function () {
@@ -70,8 +118,6 @@ it('requires a mobile WhatsApp number or a link for the hook', function () {
         ->set('form.domain', 'x.my')
         ->set('form.github_repo', 'Dynopos/x')
         ->set('form.niche', 'cerun')
-        ->set('form.cta_title', 'Hai')
-        ->set('form.cta_text', 'Hai')
         ->set('form.cta_whatsapp', '03-1234 5678')
         ->call('save')
         ->assertHasErrors('form.cta_whatsapp');

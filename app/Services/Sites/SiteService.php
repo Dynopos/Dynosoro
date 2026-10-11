@@ -34,9 +34,10 @@ class SiteService
             'banned_topics' => 'nullable|string|max:1000',
             'frequency_days' => 'required|integer|min:1|max:30',
             'paid_until' => 'nullable|date',
-            'cta_title' => 'required|string|max:120',
-            'cta_text' => 'required|string|max:300',
-            'cta_button' => 'required|string|max:40',
+            // Hook fields are optional: empty ones get a standard hook (defaultCta()).
+            'cta_title' => 'nullable|string|max:120',
+            'cta_text' => 'nullable|string|max:300',
+            'cta_button' => 'nullable|string|max:40',
             'cta_whatsapp' => 'nullable|string|max:30',
             'cta_message' => 'nullable|string|max:300',
             'cta_url' => ['nullable', 'string', 'max:300', 'regex:/^(https?:\/\/|\/)/i'],
@@ -74,7 +75,7 @@ class SiteService
             'paid_until' => $site?->paid_until?->toDateString() ?? '',
             'cta_title' => $cta['title'] ?? '',
             'cta_text' => $cta['text'] ?? '',
-            'cta_button' => $cta['button'] ?? '💬 WhatsApp Kami',
+            'cta_button' => $cta['button'] ?? '',
             'cta_whatsapp' => $cta['whatsapp'] ?? '',
             'cta_message' => $cta['message'] ?? 'Salam, saya baca artikel "{tajuk}" di website anda. Nak tanya...',
             'cta_url' => $cta['url'] ?? '',
@@ -102,9 +103,9 @@ class SiteService
             'frequency_days' => (int) $data['frequency_days'],
             'paid_until' => ($data['paid_until'] ?? '') ?: null,
             'cta' => [
-                'title' => trim($data['cta_title']),
-                'text' => trim($data['cta_text']),
-                'button' => trim($data['cta_button']),
+                'title' => trim((string) ($data['cta_title'] ?? '')) ?: self::defaultCta($data['name'])['title'],
+                'text' => trim((string) ($data['cta_text'] ?? '')) ?: self::defaultCta($data['name'])['text'],
+                'button' => trim((string) ($data['cta_button'] ?? '')) ?: self::defaultCta($data['name'])['button'],
                 'whatsapp' => trim((string) ($data['cta_whatsapp'] ?? '')) ?: null,
                 'message' => trim((string) ($data['cta_message'] ?? '')) ?: null,
                 'url' => trim((string) ($data['cta_url'] ?? '')) ?: null,
@@ -122,14 +123,62 @@ class SiteService
         return $site;
     }
 
-    /** Returns a problem in BM, or null when the repo is reachable and writable. */
+    /** Standard hook when Bob leaves the hook fields empty (a template, not AI: rule 1). */
+    public static function defaultCta(string $name): array
+    {
+        return [
+            'title' => 'Berminat dengan '.Str::squish($name).'?',
+            'text' => 'WhatsApp kami sekarang. Kami sedia bantu dan jawab soalan anda.',
+            'button' => '💬 WhatsApp Kami',
+        ];
+    }
+
+    /**
+     * Returns a problem in BM, or null when the repo is reachable and writable. A Laravel
+     * app (artisan + public/index.php) is detected and its web folder set to public.
+     */
     public function check(Site $site): ?string
     {
         try {
-            return $this->github->checkAccess($site->github_repo, $site->branch);
+            $problem = $this->github->checkAccess($site->github_repo, $site->branch);
+
+            if ($problem === null && trim((string) $site->docroot) === ''
+                && $this->github->getFile($site->github_repo, $site->branch, 'artisan') !== null
+                && $this->github->getFile($site->github_repo, $site->branch, 'public/index.php') !== null) {
+                $site->forceFill(['docroot' => 'public'])->save();
+            }
+
+            return $problem;
         } catch (Throwable $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * New website in one step: check the repo, install the blog, activate. Returns a problem
+     * in BM (the website stays paused), or null when the first article is on its way.
+     */
+    public function setUp(Site $site): ?string
+    {
+        $problem = $this->check($site);
+
+        if ($problem !== null) {
+            return $problem;
+        }
+
+        try {
+            if (! $site->installed_at) {
+                $this->publisher->install($site);
+            }
+        } catch (Throwable $e) {
+            report($e);
+
+            return 'Pasang blog gagal: '.$e->getMessage();
+        }
+
+        $this->activate($site->refresh());
+
+        return null;
     }
 
     public function install(Site $site): void

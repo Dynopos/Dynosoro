@@ -58,9 +58,19 @@ class SitesPage extends Component
 
         $this->showForm = false;
         $this->editingId = null;
-        $this->say($site->wasRecentlyCreated
-            ? "Website {$site->name} disimpan. Tekan Semak repo, kemudian Pasang blog dan Aktifkan."
-            : "Website {$site->name} dikemas kini. Tekan Bina semula jika hook berubah.");
+
+        if (! $site->wasRecentlyCreated) {
+            $this->say("Website {$site->name} dikemas kini. Tekan Bina semula jika hook berubah.");
+
+            return;
+        }
+
+        // New website: check the repo, install the blog and activate in one go.
+        $problem = $sites->setUp($site);
+
+        $problem === null
+            ? $this->say("{$site->name} siap dan aktif. Artikel pertama akan ditulis dalam 15 minit (atau tekan Terbit sekarang).")
+            : $this->say("{$site->name} disimpan tetapi belum aktif: {$problem}", 'warning');
     }
 
     public function check(SiteService $sites, int $id): void

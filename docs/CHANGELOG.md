@@ -28,6 +28,10 @@ Enjin Dyno SEO untuk Bob (admin sahaja). Belum diuji dengan Vertex AI dan GitHub
 - Panduan pasang: `docs/DEPLOY.md`.
 - Sokongan website Laravel (Folder web `public`), untuk ujian pertama di dynolead.my.
 - Domain app: `dynoseo.my`.
+- Borang website ringkas (macam Soro): nama bisnes, apa bisnes ini, domain, repo, WhatsApp.
+  Lain-lain dalam "Tetapan lanjutan". Hook standard jika kosong. **Simpan & mula** terus
+  semak repo, pasang blog dan aktifkan. App Laravel (`artisan` + `public/index.php`) dikesan
+  sendiri (folder web `public`). Prompt `plan-v2`, `write-v2`, `check-v2` terima penerangan bisnes.
 
 ## Spec v0.1 — 2026-10-11
 

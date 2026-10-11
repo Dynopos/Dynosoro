@@ -95,3 +95,14 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
 
 - **App di `dynoseo.my`** (Bob beli domain), menggantikan `seo.dynolead.my`. `www` dan
   `*.on-forge.com` dialih 301 ke `dynoseo.my` oleh `RedirectToCanonicalHost`.
+
+## 2026-10-11 — Borang ringkas (maklum balas Bob)
+
+- Bob: Soro hanya tanya apa bisnes kita; borang panjang buat pelanggan rasa lebih baik tulis
+  sendiri. Borang kini 5 medan wajib (nama, apa bisnes ini, domain, repo, WhatsApp). Medan
+  `niche` kini penerangan bisnes; AI kenal pasti bidang dan tulis artikel umum tentangnya.
+- Hook kosong → hook standard dari template ("Berminat dengan <nama>?"), bukan AI (peraturan 1).
+- Website baru: Simpan & mula = semak repo → pasang blog → aktifkan. Jika repo gagal,
+  website kekal Berhenti dengan sebabnya. Butang langkah demi langkah kekal pada kad.
+- Folder web `public` dikesan sendiri jika repo ada `artisan` dan `public/index.php`.
+

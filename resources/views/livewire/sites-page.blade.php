@@ -28,69 +28,75 @@
             <x-field label="Nama bisnes" name="form.name">
                 <input type="text" wire:model="form.name" class="input" placeholder="Gabion Pantai Timur">
             </x-field>
+            <x-field label="Apa bisnes ini?" name="form.niche" hint="Satu ayat cukup. Artikel ditulis umum ikut bidang ini.">
+                <textarea wire:model="form.niche" rows="2" class="input" placeholder="Pasang gabion dan tembok penahan cerun di Kelantan"></textarea>
+            </x-field>
             <x-field label="Domain" name="form.domain">
                 <input type="text" wire:model="form.domain" class="input" placeholder="gabionpantaitimur.my" autocapitalize="none">
             </x-field>
-            <div class="grid grid-cols-3 gap-3">
-                <div class="col-span-2">
-                    <x-field label="Repo GitHub" name="form.github_repo">
-                        <input type="text" wire:model="form.github_repo" class="input" placeholder="Dynopos/gabion" autocapitalize="none">
-                    </x-field>
-                </div>
-                <x-field label="Branch" name="form.branch">
-                    <input type="text" wire:model="form.branch" class="input" autocapitalize="none">
-                </x-field>
-            </div>
-
-            <x-field label="Folder web (pilihan)" name="form.docroot" hint="Kosong untuk GitHub Pages. Isi public untuk app Laravel (contoh dynolead.my).">
-                <input type="text" wire:model="form.docroot" class="input" placeholder="public" autocapitalize="none">
+            <x-field label="Repo GitHub" name="form.github_repo">
+                <input type="text" wire:model="form.github_repo" class="input" placeholder="Dynopos/gabion" autocapitalize="none">
             </x-field>
-
-            <p class="label pt-2">Artikel</p>
-            <x-field label="Bidang" name="form.niche" hint="Topik umum artikel. Contoh: gabion, kawalan cerun, tembok penahan tanah">
-                <textarea wire:model="form.niche" rows="2" class="input"></textarea>
-            </x-field>
-            <x-field label="Pembaca sasaran (pilihan)" name="form.audience">
-                <input type="text" wire:model="form.audience" class="input" placeholder="pemilik rumah lereng bukit, kontraktor kecil">
-            </x-field>
-            <x-field label="Kawasan (pilihan)" name="form.area">
-                <input type="text" wire:model="form.area" class="input" placeholder="Kelantan, Terengganu">
-            </x-field>
-            <x-field label="Topik dilarang (pilihan)" name="form.banned_topics" hint="Pisahkan dengan koma.">
-                <input type="text" wire:model="form.banned_topics" class="input" placeholder="harga, nama pesaing">
-            </x-field>
-            <div class="grid grid-cols-2 gap-3">
-                <x-field label="Setiap (hari)" name="form.frequency_days">
-                    <input type="number" min="1" max="30" wire:model="form.frequency_days" class="input">
-                </x-field>
-                <x-field label="Bayar sehingga" name="form.paid_until" hint="Kosong = tiada had">
-                    <input type="date" wire:model="form.paid_until" class="input">
-                </x-field>
-            </div>
-
-            <p class="label pt-2">Hook bawah artikel</p>
-            <x-field label="Tajuk" name="form.cta_title">
-                <input type="text" wire:model="form.cta_title" class="input" placeholder="Cerun rumah anda mula runtuh?">
-            </x-field>
-            <x-field label="Ayat" name="form.cta_text">
-                <textarea wire:model="form.cta_text" rows="2" class="input" placeholder="WhatsApp kami untuk lawatan tapak dan cadangan."></textarea>
-            </x-field>
-            <x-field label="Teks butang" name="form.cta_button">
-                <input type="text" wire:model="form.cta_button" class="input">
-            </x-field>
-            <x-field label="Nombor WhatsApp" name="form.cta_whatsapp" hint="Telefon bimbit 01x. Kosongkan jika guna pautan.">
+            <x-field label="Nombor WhatsApp" name="form.cta_whatsapp" hint="Untuk butang di bawah setiap artikel.">
                 <input type="tel" wire:model="form.cta_whatsapp" class="input" placeholder="0123456789">
             </x-field>
-            <x-field label="Mesej awal WhatsApp" name="form.cta_message" hint="{tajuk} diganti dengan tajuk artikel.">
-                <textarea wire:model="form.cta_message" rows="2" class="input"></textarea>
-            </x-field>
-            <x-field label="Pautan (jika tiada WhatsApp)" name="form.cta_url">
-                <input type="text" wire:model="form.cta_url" class="input" placeholder="/hubungi/" autocapitalize="none">
-            </x-field>
-            <x-toggle wire:model="form.cta_bridge" label="Ayat penyambung AI" hint="AI tulis satu ayat dari topik artikel ke hook." />
+
+            <details class="rounded-xl bg-slate-50 p-3 ring-1 ring-inset ring-slate-200" @if ($errors->hasAny(['form.branch', 'form.docroot', 'form.frequency_days', 'form.paid_until', 'form.cta_title', 'form.cta_text', 'form.cta_button', 'form.cta_message', 'form.cta_url'])) open @endif>
+                <summary class="cursor-pointer text-sm font-semibold text-slate-700">Tetapan lanjutan (pilihan)</summary>
+                <div class="mt-4 space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <x-field label="Setiap (hari)" name="form.frequency_days">
+                            <input type="number" min="1" max="30" wire:model="form.frequency_days" class="input">
+                        </x-field>
+                        <x-field label="Bayar sehingga" name="form.paid_until" hint="Kosong = tiada had">
+                            <input type="date" wire:model="form.paid_until" class="input">
+                        </x-field>
+                    </div>
+                    <x-field label="Pembaca sasaran" name="form.audience">
+                        <input type="text" wire:model="form.audience" class="input" placeholder="pemilik rumah lereng bukit">
+                    </x-field>
+                    <x-field label="Kawasan" name="form.area">
+                        <input type="text" wire:model="form.area" class="input" placeholder="Kelantan">
+                    </x-field>
+                    <x-field label="Topik dilarang" name="form.banned_topics" hint="Pisahkan dengan koma.">
+                        <input type="text" wire:model="form.banned_topics" class="input" placeholder="harga, nama pesaing">
+                    </x-field>
+
+                    <p class="label pt-1">Hook bawah artikel</p>
+                    <x-field label="Tajuk" name="form.cta_title" hint="Kosong = 'Berminat dengan (nama bisnes)?'">
+                        <input type="text" wire:model="form.cta_title" class="input">
+                    </x-field>
+                    <x-field label="Ayat" name="form.cta_text" hint="Kosong = ayat standard.">
+                        <textarea wire:model="form.cta_text" rows="2" class="input"></textarea>
+                    </x-field>
+                    <x-field label="Teks butang" name="form.cta_button">
+                        <input type="text" wire:model="form.cta_button" class="input" placeholder="💬 WhatsApp Kami">
+                    </x-field>
+                    <x-field label="Mesej awal WhatsApp" name="form.cta_message" hint="{tajuk} diganti dengan tajuk artikel.">
+                        <textarea wire:model="form.cta_message" rows="2" class="input"></textarea>
+                    </x-field>
+                    <x-field label="Pautan (jika tiada WhatsApp)" name="form.cta_url">
+                        <input type="text" wire:model="form.cta_url" class="input" placeholder="/hubungi/" autocapitalize="none">
+                    </x-field>
+                    <x-toggle wire:model="form.cta_bridge" label="Ayat penyambung AI" hint="AI tulis satu ayat dari topik artikel ke hook." />
+
+                    <p class="label pt-1">Teknikal</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <x-field label="Branch" name="form.branch">
+                            <input type="text" wire:model="form.branch" class="input" autocapitalize="none">
+                        </x-field>
+                        <x-field label="Folder web" name="form.docroot" hint="Dikesan sendiri">
+                            <input type="text" wire:model="form.docroot" class="input" placeholder="kosong / public" autocapitalize="none">
+                        </x-field>
+                    </div>
+                </div>
+            </details>
 
             <div class="flex gap-2 pt-2">
-                <button type="submit" class="btn-primary flex-1" wire:loading.attr="disabled">Simpan</button>
+                <button type="submit" class="btn-primary flex-1" wire:loading.attr="disabled">
+                    <span wire:loading.remove wire:target="save">{{ $editingId ? 'Simpan' : 'Simpan & mula' }}</span>
+                    <span wire:loading wire:target="save">Sekejap...</span>
+                </button>
                 <button type="button" wire:click="cancel" class="btn-soft">Batal</button>
             </div>
         </form>
