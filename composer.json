@@ -40,6 +40,7 @@
     },
     "scripts": {
         "post-autoload-dump": [
+            "@php -r \"foreach (['storage/app/private', 'storage/app/public', 'storage/framework/cache/data', 'storage/framework/sessions', 'storage/framework/views', 'storage/logs', 'bootstrap/cache'] as \\$d) { is_dir(\\$d) || mkdir(\\$d, 0775, true); }\"",
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],

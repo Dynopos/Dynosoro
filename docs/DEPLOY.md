@@ -84,7 +84,20 @@ model terkini, tambah harganya dalam fail itu, dan kemas kini `.env`.
 
 ## 4. Skrip deploy
 
-Site → *Deployments → Deploy Script*:
+**Site zero-downtime** (log deploy sebut `releases/...`): biarkan skrip asal Forge. Pastikan
+ia ada baris ini sebelum `$ACTIVATE_RELEASE()`:
+
+```bash
+npm ci && npm run build
+$FORGE_PHP artisan migrate --force
+$FORGE_PHP artisan optimize
+```
+
+Folder `storage` dikongsi antara release dan kosong pada deploy pertama; `composer install`
+cipta subfolder yang perlu sendiri (skrip `post-autoload-dump`). Untuk Scheduler (langkah 7)
+guna laluan `.../current/artisan`.
+
+**Site biasa** (tanpa zero-downtime): Site → *Deployments → Deploy Script*:
 
 ```bash
 cd $FORGE_SITE_PATH
@@ -127,7 +140,8 @@ tiada kos AI berganda.
 
 ## 7. Scheduler
 
-Pelayan → *Scheduler → New Scheduled Job*: `php /home/forge/seo.dynolead.my/artisan schedule:run`,
+Pelayan → *Scheduler → New Scheduled Job*: `php /home/forge/seo.dynolead.my/artisan schedule:run`
+(atau `.../current/artisan` untuk site zero-downtime),
 user `forge`, **Every Minute**.
 
 - `dynoseo:dispatch-due` setiap 15 minit: hantar website yang sampai masa terbit ke giliran,
