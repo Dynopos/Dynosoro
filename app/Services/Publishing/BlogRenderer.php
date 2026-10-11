@@ -123,7 +123,9 @@ class BlogRenderer
                 'blog_url' => '/blog/',
                 'year' => (string) now()->year,
             ], [
-                'cards' => $chunk->map(fn (Article $a) => $this->card($site, $a, $templates))->implode("\n"),
+                'cards' => $chunk->isEmpty()
+                    ? '<p class="dynoseo-lead">Artikel pertama akan diterbitkan tidak lama lagi.</p>'
+                    : $chunk->map(fn (Article $a) => $this->card($site, $a, $templates))->implode("\n"),
                 'pagination' => ($prev || $next)
                     ? '<nav class="dynoseo-pages">'.($prev ? '<a href="'.$prev.'">← Baru</a>' : '<span></span>').($next ? '<a href="'.$next.'">Lama →</a>' : '').'</nav>'
                     : '',
