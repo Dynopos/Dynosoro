@@ -112,3 +112,11 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
 - Bob mahu reka bentuk halaman jualan dengan ChatGPT dahulu. Draf pertama (RM49/bulan, butang
   WhatsApp, FAQ, schema) diberi sebagai satu fail HTML dan dikeluarkan dari app (commit revert).
   Laman utama kekal alih ke log masuk sehingga reka bentuk baru dipasang.
+
+## 2026-10-11 — Halaman jualan dipasang (design Bob)
+
+- Laman utama `dynoseo.my/` guna design ChatGPT Bob (biru/navy) dengan isi tambahan dan logo
+  DYNO SEO baru. Harga: website RM200 sekali bayar (`WEBSITE_PRICE_MYR`) + DYNO SEO RM49/bulan
+  (`DYNOSEO_PRICE_MYR`). Semua butang ke WhatsApp `COMPANY_WHATSAPP` (018-288 9932), bukan e-mel.
+- Kedudukan Bob: DYNO SEO untuk website yang dibina oleh pihak kami; pelanggan dengan website
+  sendiri diminta WhatsApp untuk semakan.
