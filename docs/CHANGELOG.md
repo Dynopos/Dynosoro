@@ -28,6 +28,7 @@ Enjin Dyno SEO untuk Bob (admin sahaja). Belum diuji dengan Vertex AI dan GitHub
 - Panduan pasang: `docs/DEPLOY.md`.
 - Sokongan website Laravel (Folder web `public`), untuk ujian pertama di dynolead.my.
 - Domain app: `dynoseo.my`.
+- Halaman jualan di `dynoseo.my/` (harga RM49/bulan, butang WhatsApp, FAQ, schema, sitemap).
 - Borang website ringkas (macam Soro): nama bisnes, apa bisnes ini, domain, repo, WhatsApp.
   Lain-lain dalam "Tetapan lanjutan". Hook standard jika kosong. **Simpan & mula** terus
   semak repo, pasang blog dan aktifkan. App Laravel (`artisan` + `public/index.php`) dikesan
