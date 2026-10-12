@@ -22,7 +22,7 @@
         ['Siapa yang menulis artikel?', 'Artikel ditulis oleh AI dalam Bahasa Melayu, kemudian disemak oleh sistem untuk tajuk berulang, fakta yang meragukan dan bahasa sebelum diterbitkan.'],
         ['Boleh saya ubah atau padam artikel?', 'Boleh. WhatsApp kami tajuk artikel yang ingin diubah atau dipadam, dan kami kemas kini di website anda.'],
         ['Adakah saya perlu tahu tentang SEO?', 'Tidak perlu. Beritahu kami apa bisnes anda dalam satu ayat. Selebihnya kami uruskan.'],
-        ['Berapa lama baru nampak hasil?', 'SEO mengambil masa. Biasanya Google mula memberi kedudukan dalam 3 hingga 6 bulan, bergantung pada bidang dan persaingan.'],
+        ['Berapa lama baru nampak hasil?', 'SEO mengambil masa. Website aktif dengan artikel baru dari minggu pertama. Artikel biasanya mula muncul dalam carian Google dan AI seperti ChatGPT pada minggu ke-5 hingga 8, dan SEO mula berkesan sekitar minggu ke-9 hingga 12. Tempoh berbeza ikut bidang dan persaingan, dan kedudukan tidak dijamin.'],
         ['Adakah DYNO SEO menjamin website saya nombor satu di Google?', 'Tidak. SEO membantu meningkatkan peluang website ditemui, tetapi tiada jaminan kedudukan pertama, trafik atau jualan.'],
         ['Apa beza DYNO SEO dengan Google Ads?', 'Google Ads menggunakan bajet iklan untuk pendedahan berbayar. DYNO SEO membina kandungan untuk peluang trafik organik. SEO mengambil masa dan hasilnya tidak dijamin.'],
         ['Adakah trafik akan terus datang jika berhenti melanggan?', 'Artikel yang sudah diterbitkan kekal di website anda dan mungkin terus ditemui melalui Google, tetapi trafik tidak dijamin. Artikel baru hanya diterbitkan semasa langganan aktif.'],
@@ -84,6 +84,17 @@
             ],
         ],
         [
+            '@type' => 'VideoObject',
+            'name' => 'Cara DYNO SEO berfungsi',
+            'description' => 'Demo ringkas: beritahu apa bisnes anda, AI rancang topik, tulis artikel dan gambar, semak, kemudian terbit sendiri setiap 2 hari dengan butang WhatsApp.',
+            'thumbnailUrl' => asset('videos/dynoseo-demo-poster.jpg'),
+            'contentUrl' => asset('videos/dynoseo-demo.mp4'),
+            'uploadDate' => '2026-10-12',
+            'duration' => 'PT1M24S',
+            'inLanguage' => 'ms',
+            'publisher' => ['@id' => url('/').'#org'],
+        ],
+        [
             '@type' => 'FAQPage',
             'mainEntity' => collect($faqs)->map(fn ($f) => ['@type' => 'Question', 'name' => $f[0], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f[1]]])->values()->all(),
         ],
@@ -105,13 +116,14 @@
 .article{background:#fff;border:1px solid #e2eaf4;border-radius:26px;box-shadow:0 35px 75px #10233f14;overflow:hidden}.article .img{height:190px;background:linear-gradient(135deg,#9fd3c7,#3d8f7a 55%,#205a4d);position:relative}.article .img:after{content:'Gambar khas ikut topik';position:absolute;left:16px;bottom:14px;background:#ffffffe0;color:#10233f;font-size:11px;font-weight:800;padding:6px 10px;border-radius:30px}.article .body{padding:24px}.article .meta{font-size:12px;color:#8794a5}.article h4{font-size:22px;letter-spacing:-.03em;margin:8px 0 10px;line-height:1.3}.article .line{height:9px;background:#eef2f7;border-radius:9px;margin:9px 0}.article .line.s{width:70%}.article .hook{margin:20px 24px 24px;background:linear-gradient(135deg,#10233f,#204b7e);color:#fff;border-radius:18px;padding:22px;text-align:center}.article .hook b{display:block;font-size:17px}.article .hook span{display:inline-block;margin-top:12px;background:var(--wa);border-radius:30px;padding:9px 18px;font-size:13px;font-weight:800}
 .process{background:white;border-block:1px solid var(--line)}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.step{padding:28px;border:1px solid var(--line);border-radius:22px;background:var(--bg)}.step b{font-size:12px;color:#3a77d4}.step h3{font-size:22px}.step p{color:var(--muted);font-size:14px}
 .comparegrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.comparecard{padding:34px;background:#fff;border:1px solid #e5ebf2;border-radius:26px;box-shadow:0 14px 40px #10233f08}.comparecard h3{font-size:32px;margin:16px 0}.comparecard h3 small{font-size:16px}.comparecard.featured{background:linear-gradient(135deg,#10233f,#204b7e);color:#fff}.comparecard.featured p{color:#d9e5f6}.comparecard.featured .kicker{color:#9bc3ff}.rows{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px}.rows li{display:flex;gap:12px;font-size:14px;line-height:1.6}.rows .x,.rows .ok{flex:none;height:24px;width:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900}.rows .x{background:#fff1f2;color:#e11d48}.rows .ok{background:#ffffff1f;color:#7ee2a8}.comparecard:not(.featured) .rows b{color:var(--navy)}.featured .rows small{color:#c9d9ef}.rows small{display:block;color:var(--muted)}
-.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:t}.when{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;position:relative}.when .tag{display:inline-block;font-size:11px;font-weight:850;letter-spacing:1px;text-transform:uppercase;color:#245ca6;background:#f0f6ff;border:1px solid #d8e5f7;border-radius:30px;padding:6px 11px}.when h3{font-size:19px;margin:16px 0 6px}.when p{margin:0;font-size:14px;color:var(--muted)}
+.demo{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}.demo ol{list-style:none;padding:0;margin:26px 0 30px;display:grid;gap:12px;counter-reset:d}.demo li{counter-increment:d;display:flex;gap:14px;align-items:flex-start;font-size:15px;line-height:1.55;color:var(--muted)}.demo li b{color:var(--navy)}.demo li:before{content:counter(d);flex:none;width:30px;height:30px;border-radius:50%;background:#f0f6ff;border:1px solid #d8e5f7;color:#245ca6;font-weight:850;font-size:13px;display:grid;place-items:center}.phone{justify-self:center;width:min(100%,340px);padding:10px;border-radius:38px;background:linear-gradient(145deg,#1d3f73,#0a1730);box-shadow:0 30px 70px #10233f40}.phone video{display:block;width:100%;height:auto;aspect-ratio:9/16;border-radius:30px;background:#020409}.demo .note{font-size:12px;color:var(--muted);margin-top:14px}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:t}.when.goal{background:linear-gradient(135deg,#10233f,#204b7e);color:#fff;border-color:transparent}.when.goal p{color:#d9e5f6}.when.goal .tag{background:#1faa5326;color:#7ee2a8;border-color:#1faa5355}.when{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;position:relative}.when .tag{display:inline-block;font-size:11px;font-weight:850;letter-spacing:1px;text-transform:uppercase;color:#245ca6;background:#f0f6ff;border:1px solid #d8e5f7;border-radius:30px;padding:6px 11px}.when h3{font-size:19px;margin:16px 0 6px}.when p{margin:0;font-size:14px;color:var(--muted)}
 .pricing{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:900px;margin:auto}.plan{background:#fff;border:1px solid var(--line);border-radius:28px;padding:34px;box-shadow:0 14px 40px #10233f08;display:flex;flex-direction:column}.plan.featured{border:2px solid var(--blue);box-shadow:0 30px 60px #3976df22;position:relative}.plan .badge{position:absolute;top:-13px;right:24px;background:var(--blue);color:#fff;font-size:11px;font-weight:850;border-radius:30px;padding:6px 12px;letter-spacing:.5px}.plan .amt{font-size:52px;font-weight:850;letter-spacing:-.06em;margin:10px 0 0}.plan .amt small{font-size:15px;font-weight:600;color:var(--muted);letter-spacing:0}.plan ul{list-style:none;padding:0;margin:22px 0 28px;display:grid;gap:11px;font-size:14px}.plan li{display:flex;gap:10px}.plan li:before{content:'✓';color:#24865a;font-weight:900}.plan .btn{margin-top:auto}.total{max-width:900px;margin:18px auto 0;text-align:center;color:var(--muted);font-size:14px}
 .faqbox{border:1px solid #e2e7ee;border-radius:28px;overflow:hidden;background:white}.faqbox details{border-bottom:1px solid #e7ecf2;padding:0 32px}.faqbox details:last-child{border-bottom:0}.faqbox summary{list-style:none;cursor:pointer;padding:24px 0;display:flex;align-items:center;justify-content:space-between;gap:18px}.faqbox summary h3{font-size:17px;font-weight:720;line-height:1.5;margin:0;letter-spacing:-.01em}.faqbox summary::-webkit-details-marker{display:none}.faqbox summary:after{content:'+';font-size:29px;font-weight:350;color:#315e9b}.faqbox details[open] summary:after{content:'×'}.faqbox details p{margin:0 0 26px;color:#748295;max-width:850px;font-size:15px}
 .cta{background:linear-gradient(135deg,#10233f,#204a7b);border-radius:32px;padding:70px 35px;text-align:center;color:white;position:relative;overflow:hidden}.cta h2{max-width:730px;margin:12px auto 20px}.cta p{color:#c8d8ec}.cta .actions{justify-content:center}.cta .secondary{background:transparent;border-color:#ffffff40;color:#fff}.ctalogo{width:96px;height:96px;border-radius:24px;margin:0 auto 6px;display:block;background:#fff;padding:6px}
 .footer{padding:36px 0 40px;color:#8390a2;font-size:13px;border-top:1px solid var(--line);background:#fff}.footin{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}.footer strong{color:#10233f}.footbrand{display:flex;align-items:center;gap:10px}.footbrand img{width:36px;height:36px;border-radius:9px}.footlinks{display:flex;gap:18px;flex-wrap:wrap}.footlinks a:hover{color:var(--blue)}
 .wafloat{position:fixed;right:18px;bottom:18px;z-index:40;display:inline-flex;align-items:center;gap:9px;background:var(--wa);color:#fff;font-weight:800;font-size:14px;border-radius:100px;padding:14px 20px;box-shadow:0 14px 30px #1faa5355}.wafloat svg{width:20px;height:20px}
-@media(max-width:980px){.problems,.timeline{grid-template-columns:repeat(2,1fr)}.anatomy{grid-template-columns:1fr}}
+@media(max-width:980px){.demo{grid-template-columns:1fr;gap:34px}.problems,.timeline{grid-template-columns:repeat(2,1fr)}.anatomy{grid-template-columns:1fr}}
 @media(max-width:850px){.links a:not(.btn){display:none}.herogrid{grid-template-columns:1fr;gap:30px}.hero{padding:64px 0 45px}.visual{min-height:400px;max-width:560px;width:100%;margin:auto}.bento{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:1fr}}
 @media(max-width:650px){.comparegrid,.pricing{grid-template-columns:1fr}.comparecard,.plan{padding:25px}}
 @media(max-width:580px){.wrap{width:min(100% - 28px,1180px)}.navin{min-height:70px}.brand{font-size:19px}.brandlogo{width:39px;height:39px}.nav .btn{padding:11px 15px;font-size:12px;min-height:44px}h1{font-size:44px}.lead{font-size:15px}.visual{min-height:330px}.dashboard{padding:12px}.dashmain{padding:19px}.float{right:-4px;bottom:0}.section{padding:65px 0}.bento,.problems,.timeline{grid-template-columns:1fr}.tile.wide{grid-column:span 1}.tile{min-height:auto;padding:25px}.faqbox details{padding:0 20px}.faqbox summary{padding:20px 0}.cta{padding:55px 23px}.footin{flex-direction:column;align-items:flex-start}.pricechip{flex:1;min-width:130px}.footer{padding-bottom:96px}}
@@ -121,7 +133,7 @@
 <header class="nav"><div class="wrap navin">
     <a class="brand" href="{{ url('/') }}"><img alt="Logo DYNO SEO" class="brandlogo" src="{{ asset('images/dynoseo-logo-128.webp') }}" width="48" height="48"> DYNO <span style="color:#3976df">SEO</span></a>
     <nav aria-label="Navigasi utama" class="links">
-        <a href="#apa-itu-seo">Apa Itu SEO</a><a href="#kelebihan">Kelebihan</a><a href="#harga">Harga</a><a href="#faq">Soalan Lazim</a>
+        <a href="#video">Cara Berfungsi</a><a href="#apa-itu-seo">Apa Itu SEO</a><a href="#kelebihan">Kelebihan</a><a href="#harga">Harga</a><a href="#faq">Soalan Lazim</a>
         <a class="btn primary" href="{{ $waStart }}">Mula Sekarang ↗</a>
     </nav>
 </div></header>
@@ -138,7 +150,7 @@
         </div>
         <div class="actions">
             <a class="btn btn-wa" href="{{ $waStart }}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 00-8.5 15l-1.5 5 5.2-1.4A9.9 9.9 0 1012.04 2zm5.8 14.1c-.25.7-1.45 1.33-2 1.38-.53.06-1.03.25-3.46-.72-2.92-1.15-4.79-4.15-4.93-4.34-.14-.2-1.18-1.57-1.18-3s.75-2.13 1.02-2.42c.26-.29.57-.36.76-.36l.55.01c.18 0 .42-.07.65.5.25.58.84 2.01.91 2.16.08.14.12.31.03.5-.1.2-.14.31-.29.48l-.43.5c-.14.14-.29.3-.12.59.17.28.75 1.24 1.6 2 1.1.98 2.03 1.29 2.31 1.43.29.15.46.12.62-.07.17-.2.72-.84.91-1.13.19-.28.38-.24.65-.14.26.1 1.68.79 1.97.94.29.14.48.21.55.33.07.12.07.7-.18 1.38z"/></svg> WhatsApp Kami</a>
-            <a class="btn secondary" href="#kelebihan">Lihat Kelebihan →</a>
+            <a class="btn secondary" href="#video">▶ Tonton Demo</a>
         </div>
         <p class="micro">Tiada kontrak · Boleh berhenti bila-bila masa · DYNO SEO untuk website yang dibina oleh pihak kami</p>
     </div>
@@ -155,6 +167,23 @@
 </div></section>
 
 <div class="strip"><div class="wrap stripin"><span>Sesuai untuk:</span><span>Kedai makan</span><span>Kontraktor</span><span>Klinik</span><span>Butik</span><span>Servis rumah</span><span>Kedai runcit</span><span>Bengkel</span></div></div>
+
+<section class="section" id="video"><div class="wrap demo">
+    <div>
+        <div class="sectionhead" style="margin-bottom:0"><span class="kicker">TONTON DEMO</span><h2>Jangan jadikan website anda hidup tanpa tujuan.</h2><p class="sub">Lihat cara DYNO SEO menghidupkan website anda dalam video ringkas ini.</p></div>
+        <ol>
+            <li><span><b>Beritahu apa bisnes anda.</b> Satu ayat sahaja.</span></li>
+            <li><span><b>AI rancang topik</b> ikut bidang anda. Tiada topik berulang.</span></li>
+            <li><span><b>AI tulis artikel dan gambar khas</b>, kemudian disemak sebelum terbit.</span></li>
+            <li><span><b>Terbit sendiri setiap 2 hari</b>, dengan butang WhatsApp di bawah setiap artikel.</span></li>
+        </ol>
+        <a class="btn btn-wa" href="{{ $waStart }}">WhatsApp Kami</a>
+    </div>
+    <div>
+        <div class="phone"><video controls playsinline preload="none" width="720" height="1280" poster="{{ asset('videos/dynoseo-demo-poster.jpg') }}" aria-label="Video demo cara DYNO SEO berfungsi"><source src="{{ asset('videos/dynoseo-demo.mp4') }}" type="video/mp4">Pelayar anda tidak menyokong video. <a href="{{ asset('videos/dynoseo-demo.mp4') }}">Muat turun video demo</a>.</video></div>
+        <p class="note" style="text-align:center">Paparan dalam video ialah contoh.</p>
+    </div>
+</div></section>
 
 <section class="section" id="masalah"><div class="wrap">
     <div class="sectionhead center"><span class="kicker">MASALAH BIASA</span><h2>Website digantung tak bertali?</h2><p class="sub">Kebanyakan website bisnes siap, kemudian dibiarkan. Hidup tanpa tujuan, mati sebelum usianya.</p></div>
@@ -240,12 +269,12 @@
 </div></section>
 
 <section class="section" id="perjalanan"><div class="wrap">
-    <div class="sectionhead"><span class="kicker">SELEPAS ANDA MULA</span><h2>Apa yang berlaku selepas anda melanggan?</h2><p class="sub">SEO ialah usaha berterusan. Ini gambaran biasa, bukan janji keputusan.</p></div>
+    <div class="sectionhead"><span class="kicker">SELEPAS ANDA MULA</span><h2>Apa yang berlaku selepas anda melanggan?</h2><p class="sub">SEO ialah usaha berterusan. Ini gambaran biasa, bukan janji keputusan. Tempoh berbeza ikut bidang dan persaingan.</p></div>
     <div class="timeline">
-        <div class="when"><span class="tag">Hari pertama</span><h3>Blog diaktifkan</h3><p>Halaman blog dipasang di website anda dan artikel pertama ditulis.</p></div>
-        <div class="when"><span class="tag">Minggu pertama</span><h3>3 hingga 4 artikel</h3><p>Website mula dikemas kini secara konsisten. Google nampak website anda aktif.</p></div>
-        <div class="when"><span class="tag">Bulan pertama</span><h3>±15 artikel</h3><p>Kandungan dalam bidang anda bertambah, dengan pautan antara artikel.</p></div>
-        <div class="when"><span class="tag">3 hingga 6 bulan</span><h3>Peluang ditemui</h3><p>Biasanya tempoh Google mula memberi kedudukan, bergantung pada bidang dan persaingan.</p></div>
+        <div class="when"><span class="tag">Minggu 1</span><h3>Website mula aktif</h3><p>Blog dipasang dan artikel pertama terbit, dengan keyword bidang bisnes anda.</p></div>
+        <div class="when"><span class="tag">Minggu 2 – 4</span><h3>Artikel mula tersebar dalam carian</h3><p>Artikel baru setiap 2 hari. Google mula jumpa dan susun artikel anda.</p></div>
+        <div class="when"><span class="tag">Minggu 5 – 8</span><h3>Mula muncul di Google, ChatGPT &amp; AI</h3><p>Bila orang tanya soalan dalam bidang anda, website anda mula ada jawapannya.</p></div>
+        <div class="when goal"><span class="tag">Minggu 9 – 12</span><h3>SEO mula berkesan</h3><p>Kedudukan makin stabil. Lebih ramai jumpa website anda dan mula WhatsApp.</p></div>
     </div>
 </div></section>
 

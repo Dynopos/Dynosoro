@@ -17,6 +17,7 @@ Route::get('/robots.txt', fn () => response(implode("\n", [
     'User-agent: *',
     'Allow: /$',
     'Allow: /images/',
+    'Allow: /videos/',
     'Disallow: /',
     '',
     'Sitemap: '.url('/sitemap.xml'),

@@ -19,9 +19,25 @@ it('shows the public sales page with one h1, price, schema and WhatsApp links', 
         ->not->toContain('mailto:');
 });
 
+it('shows the demo video and the same timeline as the video', function () {
+    $html = $this->get('/')->assertOk()->getContent();
+
+    expect($html)->toContain('id="video"')
+        ->toContain('<video controls playsinline preload="none"')
+        ->toContain(asset('videos/dynoseo-demo.mp4'))
+        ->toContain('"@type":"VideoObject"')
+        ->toContain('Minggu 1')
+        ->toContain('Minggu 9 – 12')
+        ->toContain('SEO mula berkesan')
+        ->not->toContain('3 hingga 6 bulan');
+
+    expect(public_path('videos/dynoseo-demo.mp4'))->toBeFile()
+        ->and(public_path('videos/dynoseo-demo-poster.jpg'))->toBeFile();
+});
+
 it('lets search engines crawl only the sales page', function () {
     $robots = $this->get('/robots.txt')->assertOk()->getContent();
-    expect($robots)->toContain('Allow: /$')->toContain('Disallow: /')->toContain('Sitemap: '.url('/sitemap.xml'));
+    expect($robots)->toContain('Allow: /$')->toContain('Allow: /videos/')->toContain('Disallow: /')->toContain('Sitemap: '.url('/sitemap.xml'));
 
     $this->get('/sitemap.xml')->assertOk()->assertHeader('Content-Type', 'application/xml')->assertSee(url('/'), false);
 });

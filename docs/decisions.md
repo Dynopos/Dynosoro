@@ -120,3 +120,13 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
   (`DYNOSEO_PRICE_MYR`). Semua butang ke WhatsApp `COMPANY_WHATSAPP` (018-288 9932), bukan e-mel.
 - Kedudukan Bob: DYNO SEO untuk website yang dibina oleh pihak kami; pelanggan dengan website
   sendiri diminta WhatsApp untuk semakan.
+
+## 2026-10-12 — Video demo dan timeline hasil
+
+- Video demo menegak (720×1280, ±3.5 MB) dalam `public/videos/`, `preload="none"` supaya halaman
+  kekal laju; poster JPG dimuat dahulu. `robots.txt` benarkan `/videos/` supaya Google boleh baca video.
+- Timeline hasil ikut Bob: Minggu 1 website aktif, Minggu 2–4 tersebar dalam carian, Minggu 5–8 mula
+  muncul di Google/ChatGPT/AI, Minggu 9–12 SEO mula berkesan. "5–8" (bukan "4–8") supaya tidak
+  bertindih. Nota "tempoh berbeza ikut bidang dan persaingan" dikekalkan; kedudukan tidak dijamin.
+- Harga dalam video (RM200, RM49, RM249) ialah imej, bukan dari config. Jika harga berubah, video
+  perlu dijana semula.
