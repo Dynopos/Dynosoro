@@ -31,6 +31,8 @@ Enjin Dyno SEO untuk Bob (admin sahaja). Belum diuji dengan Vertex AI dan GitHub
 - Halaman jualan `dynoseo.my/` (design Bob, logo baru, RM200 + RM49/bulan, WhatsApp, 15 FAQ, schema, sitemap).
 - Video demo "Cara DYNO SEO berfungsi" di halaman jualan (`public/videos/`, schema VideoObject). Timeline
   hasil ikut video: Minggu 1, 2–4, 5–8, 9–12 (SEO mula berkesan).
+- RM49 ditanda **harga pengenalan untuk 100 pelanggan pertama, harga akan naik** (halaman jualan,
+  FAQ, schema, video). `DYNOSEO_INTRO_SLOTS` (lalai 100, 0 = sembunyi).
 - Borang website ringkas (macam Soro): nama bisnes, apa bisnes ini, domain, repo, WhatsApp.
   Lain-lain dalam "Tetapan lanjutan". Hook standard jika kosong. **Simpan & mula** terus
   semak repo, pasang blog dan aktifkan. App Laravel (`artisan` + `public/index.php`) dikesan

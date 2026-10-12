@@ -1,19 +1,21 @@
 @php
     $price = (int) config('dynoseo.price_myr');
     $websitePrice = (int) config('dynoseo.website_price_myr');
+    $introSlots = (int) config('dynoseo.intro_slots');
+    $introNote = $introSlots > 0 ? "Harga pengenalan untuk {$introSlots} pelanggan pertama sahaja. Harga akan naik selepas itu." : '';
     $company = config('dynoseo.company.name');
     $waNumber = config('dynoseo.company.whatsapp');
     $waDisplay = preg_replace('/^(\d{3})(\d{3})(\d+)$/', '$1-$2 $3', $waNumber);
     $wa = fn (string $msg) => \App\Support\MalaysianPhone::waLink($waNumber, $msg) ?? '#';
-    $waStart = $wa("Salam, saya berminat dengan website RM{$websitePrice} dan DYNO SEO RM{$price} sebulan.");
+    $waStart = $wa("Salam, saya berminat dengan website RM{$websitePrice} dan DYNO SEO RM{$price} sebulan".($introSlots > 0 ? ' (harga pengenalan).' : '.'));
     $waAsk = $wa('Salam, saya nak tanya tentang DYNO SEO.');
     $waHave = $wa('Salam, saya dah ada website. Boleh guna DYNO SEO?');
     $title = 'DYNO SEO | Artikel SEO Automatik untuk Website Anda';
-    $description = "Website RM{$websitePrice} sekali bayar dan DYNO SEO RM{$price} sebulan: artikel SEO automatik setiap 2 hari, gambar khas dan butang WhatsApp supaya bisnes anda lebih mudah ditemui di Google.";
+    $description = "Website RM{$websitePrice} sekali bayar dan DYNO SEO RM{$price} sebulan".($introSlots > 0 ? ' (harga pengenalan)' : '').": artikel SEO automatik setiap 2 hari, gambar khas dan butang WhatsApp supaya bisnes anda lebih mudah ditemui di Google.";
 
     $faqs = [
         ['Apa itu DYNO SEO?', "DYNO SEO membantu mencari kata kunci, menulis dan menerbitkan artikel pada website DYNO secara automatik setiap 2 hari untuk membina peluang trafik organik."],
-        ['Berapakah harga langganan DYNO SEO?', "Langganan DYNO SEO ialah RM{$price} sebulan untuk satu website. Tiada kontrak."],
+        ['Berapakah harga langganan DYNO SEO?', trim("Langganan DYNO SEO ialah RM{$price} sebulan untuk satu website. Tiada kontrak. {$introNote}")],
         ['Berapakah kos untuk buat website?', "Kami menyediakan perkhidmatan membina website dengan harga RM{$websitePrice} sekali bayar."],
         ['Adakah RM'.$websitePrice.' termasuk langganan DYNO SEO?', "Tidak. RM{$websitePrice} ialah bayaran membina website, manakala DYNO SEO dikenakan RM{$price} sebulan. Bulan pertama: RM".($websitePrice + $price).'.'],
         ['Boleh guna DYNO SEO dengan website saya yang sedia ada?', 'DYNO SEO direka untuk website yang dibina oleh pihak kami. Jika anda sudah ada website, WhatsApp kami dahulu untuk semakan.'],
@@ -79,7 +81,7 @@
             'provider' => ['@id' => url('/').'#org'],
             'areaServed' => 'MY',
             'offers' => [
-                ['@type' => 'Offer', 'name' => 'Langganan DYNO SEO', 'price' => $price, 'priceCurrency' => 'MYR', 'priceSpecification' => ['@type' => 'UnitPriceSpecification', 'price' => $price, 'priceCurrency' => 'MYR', 'unitText' => 'bulan']],
+                ['@type' => 'Offer', 'name' => 'Langganan DYNO SEO', 'price' => $price, 'priceCurrency' => 'MYR', ...($introNote ? ['description' => $introNote] : []), 'priceSpecification' => ['@type' => 'UnitPriceSpecification', 'price' => $price, 'priceCurrency' => 'MYR', 'unitText' => 'bulan']],
                 ['@type' => 'Offer', 'name' => 'Bina website', 'price' => $websitePrice, 'priceCurrency' => 'MYR'],
             ],
         ],
@@ -106,7 +108,7 @@
 .nav{position:sticky;top:0;z-index:20;background:#ffffffed;backdrop-filter:blur(18px);border-bottom:1px solid #eaf0f6}.navin{min-height:82px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:11px;font-size:23px;font-weight:850;letter-spacing:-1px}.brandlogo{width:48px;height:48px;object-fit:contain;border-radius:12px}.links{display:flex;align-items:center;gap:27px;font-size:13px;font-weight:650}.links a:not(.btn):hover{color:var(--blue)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:100px;padding:15px 24px;min-height:48px;font-weight:750;font-size:14px;transition:.2s}.btn:hover{transform:translateY(-2px)}.primary{background:var(--navy);color:white;box-shadow:0 12px 28px #10233f25}.secondary{background:white;border:1px solid #dce5ef;color:var(--navy)}.btn-wa{background:var(--wa);color:#fff;box-shadow:0 12px 28px #1faa5333}.btn svg{width:18px;height:18px;flex:none}
 .hero{padding:100px 0 65px;position:relative;overflow:hidden;background:radial-gradient(circle at 83% 28%,#e1ecfc 0,transparent 35%),linear-gradient(180deg,#fff,#f7f9fc)}.herogrid{display:grid;grid-template-columns:1.02fr .98fr;align-items:center;gap:55px}.eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid #d8e5f7;background:#f0f6ff;padding:9px 14px;border-radius:100px;color:#245ca6;font-size:11px;font-weight:850;letter-spacing:1.4px;text-transform:uppercase}.dot{height:7px;width:7px;background:#4382e5;border-radius:50%}h1{font-size:clamp(44px,5.5vw,74px);letter-spacing:-.065em;line-height:1.06;margin:24px 0}h1 span{color:#3b78d8}.lead{font-size:17px;color:var(--muted);line-height:1.85;max-width:540px}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.micro{font-size:12px;color:#8794a5;margin-top:20px}
-.pricebar{display:flex;gap:12px;flex-wrap:wrap;margin-top:23px}.pricechip{background:white;border:1px solid #dce5ef;border-radius:18px;padding:13px 19px;box-shadow:0 10px 30px #10233f0b}.pricechip b{display:block;font-size:23px;letter-spacing:-1px}.pricechip small{font-size:12px;color:#69798e}
+.pricebar{display:flex;gap:12px;flex-wrap:wrap;margin-top:23px}.pricechip{background:white;border:1px solid #dce5ef;border-radius:18px;padding:13px 19px;box-shadow:0 10px 30px #10233f0b}.pricechip b{display:block;font-size:23px;letter-spacing:-1px}.pricechip small{font-size:12px;color:#69798e}.pricechip.intro{border:2px solid var(--blue)}.pricechip.intro small:first-child{color:#245ca6;font-weight:800}.intronote{margin:14px 0 0;display:inline-block;padding:10px 15px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:13px;line-height:1.5}.intronote b{color:#c2410c}.introplan{margin:-6px 0 14px;font-size:13px;font-weight:700;color:#c2410c}.intrototal{color:#c2410c}
 .visual{position:relative;min-height:460px;display:flex;align-items:center}.dashboard{width:100%;background:white;border:1px solid #e2eaf4;border-radius:26px;padding:19px;box-shadow:0 35px 75px #10233f1b;transform:rotate(-2deg)}.dashhead{display:flex;justify-content:space-between;align-items:center;padding:6px 3px 17px;font-size:12px;font-weight:800}.pill{background:#e9f6ef;color:#24865a;padding:7px 11px;border-radius:30px;font-size:10px}.dashmain{background:#10233f;border-radius:19px;color:white;padding:27px;overflow:hidden}.dashmain small{color:#b9cce6}.dashmain strong{display:block;font-size:34px;letter-spacing:-1.5px;margin:9px 0}.bars{height:135px;display:flex;gap:11px;align-items:end;margin-top:20px;border-bottom:1px solid #ffffff30}.bars i{display:block;flex:1;background:linear-gradient(#75aeff,#3267b3);border-radius:8px 8px 0 0;opacity:.92}.dashbottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.mini{padding:17px;background:#f4f7fb;border-radius:15px}.mini small{color:#7b899a;font-size:10px}.mini b{display:block;font-size:19px;margin-top:6px}.float{position:absolute;right:-20px;bottom:24px;padding:17px 20px;background:#fff;border:1px solid #e4ebf5;border-radius:17px;box-shadow:0 15px 35px #10233f1c;transform:rotate(3deg);font-size:12px;font-weight:800}.float span{color:#3a82d7}
 .strip{border-block:1px solid var(--line);background:#fff}.stripin{display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:center;align-items:center;padding:22px 0;font-size:14px;font-weight:650;color:#536479}.stripin span:first-child{color:#8a97a8;font-weight:600}
 .section{padding:90px 0}.sectionhead{max-width:690px;margin-bottom:34px}.center{text-align:center;margin-inline:auto}.kicker{font-size:11px;font-weight:850;letter-spacing:2px;text-transform:uppercase;color:#3e7dd6}h2{font-size:clamp(32px,4vw,50px);line-height:1.13;letter-spacing:-.055em;margin:15px 0}h3{letter-spacing:-.035em}p{line-height:1.8}.sub{color:var(--muted)}
@@ -146,8 +148,11 @@
         <p class="lead">Jangan biarkan website anda digantung tak bertali. DYNO SEO menulis dan menerbitkan artikel SEO automatik setiap 2 hari, lengkap dengan gambar khas dan butang WhatsApp, supaya bakal pelanggan lebih mudah menemui dan menghubungi bisnes anda.</p>
         <div class="pricebar">
             <div class="pricechip"><small>Bina website</small><b>RM{{ $websitePrice }}</b><small>Sekali bayar</small></div>
-            <div class="pricechip"><small>Langgan DYNO SEO</small><b>RM{{ $price }}</b><small>Sebulan</small></div>
+            <div class="pricechip{{ $introSlots > 0 ? ' intro' : '' }}"><small>{{ $introSlots > 0 ? 'Harga pengenalan' : 'Langgan DYNO SEO' }}</small><b>RM{{ $price }}</b><small>Sebulan</small></div>
         </div>
+        @if ($introSlots > 0)
+        <p class="intronote"><b>🔥 {{ $introSlots }} pelanggan pertama sahaja.</b> RM{{ $price }} ialah harga pengenalan. Harga akan naik selepas itu.</p>
+        @endif
         <div class="actions">
             <a class="btn btn-wa" href="{{ $waStart }}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 00-8.5 15l-1.5 5 5.2-1.4A9.9 9.9 0 1012.04 2zm5.8 14.1c-.25.7-1.45 1.33-2 1.38-.53.06-1.03.25-3.46-.72-2.92-1.15-4.79-4.15-4.93-4.34-.14-.2-1.18-1.57-1.18-3s.75-2.13 1.02-2.42c.26-.29.57-.36.76-.36l.55.01c.18 0 .42-.07.65.5.25.58.84 2.01.91 2.16.08.14.12.31.03.5-.1.2-.14.31-.29.48l-.43.5c-.14.14-.29.3-.12.59.17.28.75 1.24 1.6 2 1.1.98 2.03 1.29 2.31 1.43.29.15.46.12.62-.07.17-.2.72-.84.91-1.13.19-.28.38-.24.65-.14.26.1 1.68.79 1.97.94.29.14.48.21.55.33.07.12.07.7-.18 1.38z"/></svg> WhatsApp Kami</a>
             <a class="btn secondary" href="#video">▶ Tonton Demo</a>
@@ -249,7 +254,7 @@
         </article>
         <article class="comparecard featured"><span class="kicker">DYNO SEO</span><h3>RM{{ $price }} <small>/bulan</small></h3><p>Artikel automatik setiap 2 hari, penyusunan kata kunci dan usaha membina trafik organik jangka panjang.</p>
             <ul class="rows">
-                <li><span class="ok">✓</span><span><b>Harga tetap</b><small>RM{{ $price }} sebulan, tidak kira berapa ramai yang membaca.</small></span></li>
+                <li><span class="ok">✓</span><span><b>Harga tetap</b><small>RM{{ $price }} sebulan{{ $introSlots > 0 ? ' (harga pengenalan)' : '' }}, tidak kira berapa ramai yang membaca.</small></span></li>
                 <li><span class="ok">✓</span><span><b>Artikel kekal</b><small>Artikel yang diterbitkan kekal di website anda.</small></span></li>
                 <li><span class="ok">✓</span><span><b>Tiada kontrak</b><small>Boleh berhenti bila-bila masa.</small></span></li>
                 <li><span class="ok">✓</span><span><b>Bina aset jangka panjang</b><small>Website, kandungan dan pelanggan milik anda sendiri.</small></span></li>
@@ -288,14 +293,15 @@
             <a class="btn secondary" href="{{ $wa("Salam, saya nak tempah website RM{$websitePrice}.") }}">Tempah Website</a>
         </div>
         <div class="plan featured">
-            <span class="badge">PALING BERNILAI</span>
+            <span class="badge">{{ $introSlots > 0 ? 'HARGA PENGENALAN' : 'PALING BERNILAI' }}</span>
             <span class="kicker">LANGGAN DYNO SEO</span>
             <p class="amt">RM{{ $price }} <small>/bulan</small></p>
+            @if ($introSlots > 0)<p class="introplan">Untuk {{ $introSlots }} pelanggan pertama sahaja. Harga akan naik.</p>@endif
             <ul><li>Artikel SEO baru setiap 2 hari (±15 sebulan)</li><li>Gambar khas untuk setiap artikel</li><li>Topik & kata kunci disusun automatik</li><li>Butang WhatsApp di bawah setiap artikel</li><li>Sitemap, schema dan pautan dalaman</li><li>Tiada kontrak, boleh berhenti bila-bila masa</li></ul>
             <a class="btn btn-wa" href="{{ $waStart }}">Langgan Melalui WhatsApp</a>
         </div>
     </div>
-    <p class="total">Bulan pertama: RM{{ $websitePrice }} + RM{{ $price }} = <b>RM{{ $websitePrice + $price }}</b>. Bulan seterusnya: RM{{ $price }} sahaja.</p>
+    <p class="total">Bulan pertama: RM{{ $websitePrice }} + RM{{ $price }} = <b>RM{{ $websitePrice + $price }}</b>. Bulan seterusnya: RM{{ $price }} sahaja.@if ($introSlots > 0)<br><b class="intrototal">{{ $introNote }}</b>@endif</p>
 </div></section>
 
 <section class="section" id="faq"><div class="wrap">
@@ -311,7 +317,7 @@
     <img src="{{ asset('images/dynoseo-logo.webp') }}" alt="Logo DYNO SEO" class="ctalogo" width="96" height="96" loading="lazy">
     <span class="kicker" style="color:#9ec4ff">MULAKAN LANGKAH SETERUSNYA</span>
     <h2>Jadikan website anda mesin jualan sekarang.</h2>
-    <p>Bina website pada harga RM{{ $websitePrice }} sekali bayar dan langgan DYNO SEO pada harga RM{{ $price }} sebulan. WhatsApp kami di {{ $waDisplay }}.</p>
+    <p>Bina website pada harga RM{{ $websitePrice }} sekali bayar dan langgan DYNO SEO pada harga RM{{ $price }} sebulan. {{ $introNote }} WhatsApp kami di {{ $waDisplay }}.</p>
     <div class="actions">
         <a class="btn btn-wa" href="{{ $waStart }}">💬 WhatsApp {{ $waDisplay }}</a>
         <a class="btn secondary" href="{{ $waHave }}">Saya dah ada website</a>

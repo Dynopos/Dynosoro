@@ -130,3 +130,11 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
   bertindih. Nota "tempoh berbeza ikut bidang dan persaingan" dikekalkan; kedudukan tidak dijamin.
 - Harga dalam video (RM200, RM49, RM249) ialah imej, bukan dari config. Jika harga berubah, video
   perlu dijana semula.
+
+## 2026-10-12 — Harga pengenalan
+
+- Arahan Bob: RM49 ialah harga pengenalan untuk 100 pelanggan pertama, harga akan naik. Ditulis
+  sebagai teks sahaja (`DYNOSEO_INTRO_SLOTS=100`; 0 sembunyikan semua nota). Tiada kaunter "baki
+  slot" kerana app belum ada data pelanggan berbayar; kaunter palsu mengelirukan.
+- Halaman tidak sebut harga baru, dan tidak janji pelanggan awal kekal RM49. Bob perlu putuskan
+  kedua-duanya sebelum ia ditulis.

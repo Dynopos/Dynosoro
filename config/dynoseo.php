@@ -12,6 +12,8 @@ return [
     // Public prices on the sales page (RM). Dyno SEO per website per month; website build once.
     'price_myr' => (int) env('DYNOSEO_PRICE_MYR', 49),
     'website_price_myr' => (int) env('WEBSITE_PRICE_MYR', 200),
+    // Introductory price: shown as "harga pengenalan untuk N pelanggan pertama". 0 hides the note.
+    'intro_slots' => (int) env('DYNOSEO_INTRO_SLOTS', 100),
 
     'company' => [
         'name' => env('COMPANY_NAME', 'DynoPOS Technologies'),

@@ -51,3 +51,20 @@ it('uses the configured price everywhere on the page', function () {
 
     $this->get('/')->assertSee('RM59')->assertDontSee('RM49');
 });
+
+it('marks the monthly price as an introductory price for the first customers', function () {
+    $html = $this->get('/')->assertOk()->getContent();
+
+    expect($html)->toContain('100 pelanggan pertama')
+        ->toContain('Harga akan naik')
+        ->toContain('HARGA PENGENALAN');
+});
+
+it('hides the introductory price note when it is switched off', function () {
+    config(['dynoseo.intro_slots' => 0]);
+
+    $this->get('/')->assertOk()
+        ->assertDontSee('pelanggan pertama')
+        ->assertDontSee('Harga akan naik')
+        ->assertSee('PALING BERNILAI');
+});
