@@ -118,6 +118,45 @@
                 <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Seterusnya</dt><dd class="text-sm font-semibold">{{ $site->status === \App\Enums\SiteStatus::Active && $site->next_publish_at ? $site->next_publish_at->format('d/m H:i') : '-' }}</dd></div>
             </dl>
 
+            {{-- Business analysis: topics are planned only after the admin confirms it. --}}
+            <div @class(['mt-3 rounded-xl p-3 ring-1 ring-inset', 'bg-emerald-50/60 ring-emerald-200' => $site->hasConfirmedAnalysis(), 'bg-amber-50 ring-amber-200' => ! $site->hasConfirmedAnalysis()])>
+                <div class="flex items-center justify-between gap-2">
+                    <p class="flex items-center gap-1.5 text-sm font-bold"><x-icon name="sparkles" class="h-4 w-4" />Analisis bisnes</p>
+                    @if ($site->hasConfirmedAnalysis())
+                        <span class="chip bg-emerald-100 text-emerald-800">Disahkan {{ $site->analysis_confirmed_at->format('d/m') }}</span>
+                    @elseif ($site->analysis)
+                        <span class="chip bg-amber-100 text-amber-900">Belum disahkan</span>
+                    @endif
+                </div>
+
+                @if ($site->analysis)
+                    @php($a = $site->analysis)
+                    <p class="mt-2 text-sm"><b>{{ $a['field'] }}</b>: {{ $a['summary'] }}</p>
+                    @if ($a['services'])<p class="mt-1.5 text-xs text-slate-600"><b>Perkhidmatan:</b> {{ implode(', ', $a['services']) }}</p>@endif
+                    <p class="mt-1.5 text-xs text-slate-600"><b>Kluster topik:</b> {{ collect($a['pillars'])->pluck('name')->implode(' · ') }}</p>
+                    @if ($a['avoid'])<p class="mt-1.5 text-xs text-rose-700"><b>Tak akan ditulis:</b> {{ implode(', ', $a['avoid']) }}</p>@endif
+                    @if ($a['confidence'] !== 'tinggi' && $a['question'])
+                        <p class="mt-2 rounded-lg bg-white p-2 text-xs text-amber-900 ring-1 ring-inset ring-amber-200"><b>AI kurang pasti:</b> {{ $a['question'] }}</p>
+                    @endif
+                @else
+                    <p class="mt-1 text-xs text-slate-600">AI baca website ini dan kenal pasti bidang bisnes, perkhidmatan dan topik yang patut ditulis, sebelum menulis artikel.</p>
+                @endif
+
+                @unless ($site->hasConfirmedAnalysis())
+                    <textarea wire:model="corrections.{{ $site->id }}" rows="2" class="input mt-2 text-sm" placeholder="Betulkan jika salah, contoh: Skylift ialah lori platform angkat untuk kerja di tempat tinggi, bukan oksigen."></textarea>
+                @endunless
+                <div class="mt-2 flex flex-wrap gap-2">
+                    @if ($site->analysis && ! $site->hasConfirmedAnalysis())
+                        <button wire:click="confirmAnalysis({{ $site->id }})" class="btn-primary px-3 py-2"><x-icon name="check-circle" class="h-4 w-4" /> Betul, sahkan</button>
+                    @endif
+                    <button wire:click="analyse({{ $site->id }})" @if ($site->hasConfirmedAnalysis()) wire:confirm="Analisis semula? Topik baru tidak dirancang sehingga analisis baru disahkan." @endif
+                            class="btn-soft px-3 py-2" wire:loading.attr="disabled" wire:target="analyse({{ $site->id }})">
+                        <span wire:loading.remove wire:target="analyse({{ $site->id }})">{{ $site->analysis ? 'Analisis semula' : 'Analisis bisnes' }}</span>
+                        <span wire:loading wire:target="analyse({{ $site->id }})">AI sedang baca website…</span>
+                    </button>
+                </div>
+            </div>
+
             @if ($site->status_note)
                 <p class="mt-3 rounded-xl bg-amber-50 p-2.5 text-xs text-amber-900">{{ $site->status_note }}</p>
             @endif

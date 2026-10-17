@@ -117,6 +117,37 @@ function planReply(array $topics = []): array
     ]];
 }
 
+/** Which fake queue a Vertex text request belongs to, from its response schema. */
+function vertexPurpose(array $schemaProperties): string
+{
+    return match (true) {
+        isset($schemaProperties['pillars']) => 'analyse',
+        isset($schemaProperties['topics']) => 'plan',
+        isset($schemaProperties['pass']) => 'check',
+        default => 'write',
+    };
+}
+
+/** A business analysis reply (SiteAnalyst). */
+function analysisReply(array $overrides = []): array
+{
+    return array_replace([
+        'field' => 'sewa skylift dan kerja di tempat tinggi',
+        'summary' => 'Sewa lori skylift dengan operator untuk kerja pasang papan tanda, lampu jalan dan cat bangunan tinggi.',
+        'services' => ['sewa skylift', 'pasang papan tanda', 'kerja lampu jalan'],
+        'customers' => ['kontraktor', 'pemilik kedai', 'pengurusan bangunan'],
+        'searches' => ['sewa skylift kelantan', 'harga sewa skylift sehari'],
+        'pillars' => [
+            ['name' => 'keselamatan kerja tinggi', 'about' => 'Amalan selamat bekerja di tempat tinggi.'],
+            ['name' => 'pilih skylift', 'about' => 'Jenis dan saiz skylift ikut kerja.'],
+            ['name' => 'papan tanda', 'about' => 'Pasang dan selenggara papan tanda.'],
+        ],
+        'avoid' => ['oksigen', 'tangki oksigen', 'penerbangan'],
+        'confidence' => 'tinggi',
+        'question' => '',
+    ], $overrides);
+}
+
 /** A Gemini generateContent response whose text is $data as JSON. */
 function geminiReply(array|string $data, int $input = 1200, int $output = 1500): array
 {
@@ -141,9 +172,10 @@ function tinyPng(): string
  * Fake Vertex AI. Queues per purpose (plan, write, check); the last reply repeats when a
  * queue runs out. Images return a small PNG unless $image is false.
  */
-function fakeVertex(array $write = [], array $check = [], array $plan = [], bool|array $image = true, ?FakeGitHub $github = null, array $extra = []): void
+function fakeVertex(array $write = [], array $check = [], array $plan = [], bool|array $image = true, ?FakeGitHub $github = null, array $extra = [], array $analyse = []): void
 {
     $queues = [
+        'analyse' => $analyse ?: [geminiReply(analysisReply())],
         'plan' => $plan ?: [geminiReply(planReply())],
         'write' => $write ?: [geminiReply(draftReply())],
         'check' => $check ?: [geminiReply(['pass' => true, 'issues' => []], 2000, 50)],
@@ -161,7 +193,7 @@ function fakeVertex(array $write = [], array $check = [], array $plan = [], bool
             }
 
             $schema = $request['generationConfig']['responseSchema']['properties'] ?? [];
-            $key = isset($schema['topics']) ? 'plan' : (isset($schema['pass']) ? 'check' : 'write');
+            $key = vertexPurpose($schema);
             $reply = count($queues[$key]) > 1 ? array_shift($queues[$key]) : $queues[$key][0];
 
             return isset($reply['__status']) ? Http::response($reply['body'], $reply['__status']) : Http::response($reply);
@@ -185,9 +217,8 @@ function vertexRequests(string $purpose): Collection
             return false;
         }
         $schema = $request['generationConfig']['responseSchema']['properties'] ?? [];
-        $key = isset($schema['topics']) ? 'plan' : (isset($schema['pass']) ? 'check' : 'write');
 
-        return $key === $purpose;
+        return vertexPurpose($schema) === $purpose;
     })->map(fn ($pair) => $pair[0]);
 }
 

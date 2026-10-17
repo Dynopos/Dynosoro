@@ -1,4 +1,4 @@
-prompt_version: plan-v2
+prompt_version: plan-v3
 
 ## SYSTEM
 
@@ -17,12 +17,16 @@ Peraturan:
   tanda), penerangan (apa itu, kenapa), musim/tempatan (musim tengkujuh, kawasan pembaca).
 - Elak topik yang memerlukan angka tepat, statistik, undang-undang atau piawaian rasmi untuk dijawab.
 - Elak topik dilarang.
+- Jika senarai "Kluster topik yang dibenarkan" diberi: setiap topik MESTI dalam salah satu
+  kluster itu, dan `cluster` diisi dengan nama kluster itu TEPAT seperti ditulis. Jangan
+  cadangkan apa-apa yang tersenarai dalam "JANGAN tulis tentang".
 
 Jawab dalam JSON sahaja.
 
 ## USER
 
-Bisnes pemilik website (kenal pasti bidangnya; artikel UMUM tentang bidang itu, bukan tentang bisnes ini): {{niche}}
+Bisnes pemilik website (artikel UMUM tentang bidang ini, bukan tentang bisnes ini):
+{{niche}}
 Pembaca sasaran: {{audience}}
 Kawasan: {{area}}
 Topik dilarang: {{banned}}

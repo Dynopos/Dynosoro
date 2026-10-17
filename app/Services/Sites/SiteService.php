@@ -176,7 +176,12 @@ class SiteService
             return 'Pasang blog gagal: '.$e->getMessage();
         }
 
-        $this->activate($site->refresh());
+        // A new website starts only after its business analysis is confirmed.
+        if (! $site->refresh()->hasConfirmedAnalysis()) {
+            return 'Semak analisis bisnes di bawah dan tekan "Betul, sahkan", kemudian Aktifkan.';
+        }
+
+        $this->activate($site);
 
         return null;
     }

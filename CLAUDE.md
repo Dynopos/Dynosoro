@@ -45,6 +45,9 @@ Ditulis dalam kod, bukan diharap AI ingat. Setiap satu perlukan test.
 7. **Tiada rahsia dalam repo.** Token GitHub, kunci service account GCP dalam `.env` /
    di luar repo. `.env.example` tunjuk nama pembolehubah sahaja.
 8. **Tiada topik berulang** dalam website yang sama.
+9. **Analisis bisnes disahkan dahulu.** Topik hanya dirancang, dan artikel hanya diterbitkan,
+   untuk website yang analisis bisnesnya telah disahkan admin. Topik mesti dalam kluster yang
+   disahkan dan tidak menyentuh senarai "jangan tulis".
 
 ## Kawalan kos
 

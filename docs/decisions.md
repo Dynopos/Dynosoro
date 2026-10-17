@@ -138,3 +138,16 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
   slot" kerana app belum ada data pelanggan berbayar; kaunter palsu mengelirukan.
 - Halaman tidak sebut harga baru, dan tidak janji pelanggan awal kekal RM49. Bob perlu putuskan
   kedua-duanya sebelum ia ditulis.
+
+
+## 2026-10-17 — Analisis bisnes wajib disahkan sebelum topik dirancang
+
+- Kes skylift → oksigen: satu baris `niche` tidak cukup untuk AI memahami bidang. Pilihan paling
+  selamat: AI baca website sebenar, admin sahkan, dan perancangan topik dikunci sehingga itu.
+- Website sedia ada tanpa analisis disahkan **berhenti menerbit** selepas deploy (termasuk topik
+  dan draf lama, yang mungkin sudah tersasar). Kos: Bob perlu tekan "Analisis bisnes" dan
+  "Betul, sahkan" sekali bagi setiap website. Dianggap lebih murah daripada artikel memalukan.
+- Analisis guna `GEMINI_MODEL_WRITE` (satu panggilan setiap website, jarang) kerana kefahaman
+  bidang lebih penting daripada kos. `GitHubClient` hanya dibaca (`getFile`) oleh `SiteAnalyst`.
+- Padanan kluster dalam kod longgar (normalisasi `Topic::keyFor`, padanan sebahagian) supaya
+  variasi kecil nama kluster dari AI tidak membuang topik yang betul.

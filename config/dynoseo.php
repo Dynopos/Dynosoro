@@ -36,6 +36,7 @@ return [
         'max_tokens_plan' => 4000,
         'max_tokens_write' => 8192,
         'max_tokens_check' => 1500,
+        'max_tokens_analyse' => 3000,
         // Rewrites after the first draft (spec §4: maximum 2).
         'max_rewrites' => 2,
         'max_image_attempts' => 2,

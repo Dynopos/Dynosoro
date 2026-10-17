@@ -14,7 +14,7 @@ class Site extends Model
     use BelongsToWorkspace, HasFactory;
 
     protected $fillable = [
-        'name', 'domain', 'github_repo', 'branch', 'docroot', 'niche', 'audience', 'area', 'banned_topics',
+        'name', 'domain', 'github_repo', 'branch', 'docroot', 'niche', 'audience', 'area', 'banned_topics', 'analysis',
         'frequency_days', 'status', 'status_note', 'failure_count', 'next_publish_at',
         'last_published_at', 'paid_until', 'cta', 'cta_bridge', 'installed_at', 'blog_pages',
     ];
@@ -31,8 +31,51 @@ class Site extends Model
             'next_publish_at' => 'datetime',
             'last_published_at' => 'datetime',
             'installed_at' => 'datetime',
+            'analysis' => 'array',
+            'analysis_confirmed_at' => 'datetime',
             'paid_until' => 'date',
         ];
+    }
+
+    /** Topics are planned only from a business analysis the admin has confirmed. */
+    public function hasConfirmedAnalysis(): bool
+    {
+        return $this->analysis !== null && $this->analysis_confirmed_at !== null;
+    }
+
+    /** Topic cluster names the confirmed analysis allows. */
+    public function pillarNames(): array
+    {
+        return $this->hasConfirmedAnalysis() ? array_column($this->analysis['pillars'] ?? [], 'name') : [];
+    }
+
+    /** Topics the confirmed analysis says are off-field. */
+    public function avoidList(): array
+    {
+        return $this->hasConfirmedAnalysis() ? ($this->analysis['avoid'] ?? []) : [];
+    }
+
+    /**
+     * What the business is, for the plan, write and check prompts: the confirmed analysis,
+     * or the owner's one-line description for a website that has none yet.
+     */
+    public function fieldContext(): string
+    {
+        if (! $this->hasConfirmedAnalysis()) {
+            return 'Penerangan pemilik (kenal pasti bidangnya dengan berhati-hati): '.$this->niche;
+        }
+
+        $a = $this->analysis;
+
+        return implode("\n", array_filter([
+            'Bidang: '.$a['field'],
+            'Apa bisnes ini buat: '.$a['summary'],
+            $a['services'] ? 'Perkhidmatan: '.implode(', ', $a['services']) : null,
+            $a['customers'] ? 'Pelanggan: '.implode(', ', $a['customers']) : null,
+            $a['searches'] ? 'Apa pelanggan cari di Google: '.implode('; ', $a['searches']) : null,
+            'Kluster topik yang dibenarkan: '.collect($a['pillars'])->map(fn ($p) => $p['name'].' ('.$p['about'].')')->implode('; '),
+            $a['avoid'] ? 'JANGAN tulis tentang (tiada kaitan dengan bisnes ini): '.implode('; ', $a['avoid']) : null,
+        ]));
     }
 
     public function topics(): HasMany

@@ -1,4 +1,4 @@
-prompt_version: check-v2
+prompt_version: check-v3
 
 ## SYSTEM
 
@@ -14,13 +14,16 @@ GAGALKAN (pass = false) jika ada mana-mana:
 4. Bahasa Indonesia (contoh: bisa, kamu, uang, karena, silakan, kantor) atau bahasa yang janggal.
 5. Isi terlalu mirip dengan tajuk artikel lama yang disenaraikan.
 6. Nada spam: kata kunci diulang berlebihan, ayat kosong, mengarut.
+7. Artikel bukan tentang bidang bisnes website ini, atau tentang perkara dalam senarai
+   "JANGAN tulis tentang". Artikel yang tersasar bidang memalukan pemilik website.
 
 Kesilapan kecil gaya bukan sebab untuk gagal. Setiap isu: satu ayat pendek dalam Bahasa
 Melayu yang menerangkan apa perlu dibetulkan. Jawab dalam JSON sahaja.
 
 ## USER
 
-Bisnes pemilik website (kenal pasti bidangnya; artikel UMUM tentang bidang itu, bukan tentang bisnes ini): {{niche}}
+Bisnes pemilik website (artikel UMUM tentang bidang ini, bukan tentang bisnes ini):
+{{niche}}
 
 Tajuk artikel lama:
 {{existing}}
