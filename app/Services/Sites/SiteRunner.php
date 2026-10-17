@@ -4,6 +4,7 @@ namespace App\Services\Sites;
 
 use App\Enums\ArticleStatus;
 use App\Enums\SiteStatus;
+use App\Exceptions\AnalysisRequired;
 use App\Exceptions\BudgetExceeded;
 use App\Exceptions\PricesNotConfigured;
 use App\Exceptions\VertexException;
@@ -44,6 +45,14 @@ class SiteRunner
 
         if ($this->publishedToday($site) >= (int) config('dynoseo.articles.max_per_site_per_day')) {
             $this->postpone($site, 'Had artikel sehari untuk website ini dah dicapai.', $this->nextSlot($site, 1));
+
+            return null;
+        }
+
+        // No confirmed business analysis: publish nothing, not even topics or drafts made before
+        // analyses existed (they may be off-field). Waits for the admin; not a failure.
+        if (! $site->hasConfirmedAnalysis()) {
+            $this->postpone($site, AnalysisRequired::MESSAGE, now()->addDay());
 
             return null;
         }

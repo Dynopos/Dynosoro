@@ -1,5 +1,24 @@
 # Changelog
 
+## Analisis bisnes — 2026-10-17
+
+Punca: dalam demo kepada pelanggan skylift, app merancang posting tentang oksigen. AI hanya
+diberi satu baris penerangan ("skylift") dan meneka bidangnya sendiri tanpa disemak.
+
+- **Analisis bisnes setiap website** (`SiteAnalyst`, prompt `analyse-v1`, model tulis): AI baca
+  halaman utama website dari repo GitHub, kemudian tentukan bidang, apa bisnes buat,
+  perkhidmatan, pelanggan, apa yang pelanggan cari di Google, 4–6 kluster topik, dan topik yang
+  TIDAK boleh ditulis. Jika kurang pasti, AI tanya satu soalan.
+- **Admin sahkan dahulu.** Kad website tunjuk analisis; admin tekan "Betul, sahkan", atau tulis
+  pembetulan dan "Analisis semula". Website baru tidak aktif sehingga analisis disahkan.
+- **Tiada terbit tanpa analisis disahkan**: website lama juga ditahan (nota pada kad, bukan
+  dikira gagal) sehingga analisisnya disahkan. Selepas disahkan, topik AI lama yang tersasar
+  bidang dibuang.
+- **Topik dirancang ikut analisis** (`plan-v3`): setiap topik mesti dalam kluster yang disahkan;
+  kod buang topik luar kluster atau yang menyentuh senarai "jangan tulis".
+- **Penulis dan penyemak** (`write-v3`, `check-v3`) diberi bidang, kluster dan senarai "jangan
+  tulis"; penyemak gagalkan artikel yang tersasar bidang.
+
 ## Fasa 0 — 2026-10-11
 
 Enjin Dyno SEO untuk Bob (admin sahaja). Belum diuji dengan Vertex AI dan GitHub sebenar.

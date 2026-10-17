@@ -2,6 +2,7 @@
 
 namespace App\Services\Content;
 
+use App\Exceptions\AnalysisRequired;
 use App\Exceptions\VertexException;
 use App\Models\Article;
 use App\Models\Site;
@@ -46,18 +47,23 @@ class TopicPlanner
     /** Plan more topics when fewer than `refill_below` are left. Returns the number added. */
     public function ensureBacklog(Site $site): int
     {
-        if ($this->plannedCount($site) >= (int) config('dynoseo.articles.refill_below')) {
+        if ($this->plannedCount($site) >= (int) config('dynoseo.articles.refill_below') || ! $site->hasConfirmedAnalysis()) {
             return 0;
         }
 
         return $this->plan($site);
     }
 
+    /** @throws AnalysisRequired */
     public function plan(Site $site): int
     {
+        if (! $site->hasConfirmedAnalysis()) {
+            throw new AnalysisRequired;
+        }
+
         $existing = $this->existingTitles($site);
         $prompt = $this->prompts->render('plan-topics', [], [
-            'niche' => $site->niche,
+            'niche' => $site->fieldContext(),
             'audience' => $site->audience ?: '-',
             'area' => $site->area ?: 'Malaysia',
             'banned' => $site->banned_topics ?: '-',
@@ -85,7 +91,7 @@ class TopicPlanner
 
         $added = 0;
         foreach ($topics as $topic) {
-            if (is_array($topic) && $this->add($site, (string) ($topic['title'] ?? ''), (string) ($topic['target_keyword'] ?? ''), $topic['intent'] ?? null, $topic['cluster'] ?? null)) {
+            if (is_array($topic) && $this->onField($site, $topic) && $this->add($site, (string) ($topic['title'] ?? ''), (string) ($topic['target_keyword'] ?? ''), $topic['intent'] ?? null, $topic['cluster'] ?? null)) {
                 $added++;
             }
         }
@@ -115,6 +121,42 @@ class TopicPlanner
             'status' => 'planned',
             'source' => $source,
         ]);
+    }
+
+    /** After an analysis is confirmed: AI topics planned earlier that are off-field are skipped. */
+    public function dropOffField(Site $site): int
+    {
+        return $site->topics()->where('status', 'planned')->where('source', 'ai')->get()
+            ->reject(fn (Topic $t) => $this->onField($site, ['title' => $t->title, 'target_keyword' => $t->target_keyword, 'cluster' => $t->cluster]))
+            ->each(fn (Topic $t) => $t->forceFill(['status' => 'skipped'])->save())
+            ->count();
+    }
+
+    /**
+     * Code check on an AI topic: it must sit in one of the confirmed topic clusters and must
+     * not touch anything the analysis lists as off-field (e.g. "oksigen" for a skylift company).
+     */
+    public function onField(Site $site, array $topic): bool
+    {
+        $text = mb_strtolower(($topic['title'] ?? '').' '.($topic['target_keyword'] ?? ''));
+
+        foreach ($site->avoidList() as $avoid) {
+            $avoid = mb_strtolower(trim($avoid));
+            if ($avoid !== '' && str_word_count($avoid) <= 4 && str_contains($text, $avoid)) {
+                return false;
+            }
+        }
+
+        $pillars = array_map(fn ($p) => Topic::keyFor($p), $site->pillarNames());
+        if ($pillars === []) {
+            return true;
+        }
+
+        $cluster = Topic::keyFor((string) ($topic['cluster'] ?? ''));
+
+        return $cluster !== '' && collect($pillars)->contains(
+            fn ($p) => $p === $cluster || str_contains($p, $cluster) || str_contains($cluster, $p)
+        );
     }
 
     public function isDuplicate(Site $site, string $title, string $keywordKey): bool

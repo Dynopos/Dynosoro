@@ -15,9 +15,10 @@ arch('Vertex is only called through AiGateway')
     ->toOnlyBeUsedIn('App\Services\Ai\AiGateway');
 
 // Commits pass RepoGuard (rule 5).
+// SiteAnalyst only reads the home page (getFile) for the business analysis.
 arch('GitHub writes only go through SitePublisher')
     ->expect('App\Services\Publishing\GitHubClient')
-    ->toOnlyBeUsedIn(['App\Services\Publishing\SitePublisher', 'App\Services\Publishing\SiteTemplates', 'App\Services\Sites\SiteService']);
+    ->toOnlyBeUsedIn(['App\Services\Publishing\SitePublisher', 'App\Services\Publishing\SiteTemplates', 'App\Services\Sites\SiteService', 'App\Services\Content\SiteAnalyst']);
 
 arch('Livewire components hold no client dependencies')
     ->expect('App\Livewire')

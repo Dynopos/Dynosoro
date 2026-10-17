@@ -32,7 +32,7 @@ class ArticleChecker
             ->map(fn ($t) => '- '.$t)->implode("\n");
 
         $prompt = $this->prompts->render('check', [], [
-            'niche' => $site->niche,
+            'niche' => $site->fieldContext(),
             'existing' => $existing ?: '-',
             'title' => $draft['title'],
             'meta' => $draft['meta_description'],

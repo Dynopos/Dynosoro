@@ -29,12 +29,12 @@ it('sends guests to the login page', function () {
     $this->get('/masuk')->assertOk()->assertSee('Masuk');
 });
 
-it('sets up a new website in one step from five fields', function () {
+it('sets up a new website from five fields, and starts it once the business analysis is confirmed', function () {
     $github = fakeGitHub(['Dynopos/gabion' => siteRepo()]);
     fakeVertex(github: $github);
     actingAsAdmin();
 
-    Livewire::test(SitesPage::class)
+    $page = Livewire::test(SitesPage::class)
         ->call('create')
         ->set('form.name', 'Gabion Pantai Timur')
         ->set('form.niche', 'Pasang gabion dan tembok penahan cerun di Kelantan')
@@ -43,9 +43,16 @@ it('sets up a new website in one step from five fields', function () {
         ->set('form.cta_whatsapp', '012-345 6789')
         ->call('save')
         ->assertHasNoErrors()
-        ->assertSee('siap dan aktif');
+        ->assertSee('belum aktif')
+        ->assertSee('Betul, sahkan');
 
     $site = Site::query()->sole();
+    expect($site->status)->toBe(SiteStatus::Paused)->and($site->analysis)->not->toBeNull();
+
+    $page->call('activate', $site->id)->assertSee('Sahkan analisis bisnes dahulu');
+    $page->call('confirmAnalysis', $site->id)->call('activate', $site->id)->assertSee('aktif');
+
+    $site->refresh();
     expect($site->status)->toBe(SiteStatus::Active)
         ->and($site->installed_at)->not->toBeNull()
         ->and($site->domain)->toBe('gabionpantaitimur.my')
@@ -69,7 +76,7 @@ it('detects a Laravel app and writes the blog into public/', function () {
         ->set('form.github_repo', 'Dynopos/Dynolead')
         ->set('form.cta_whatsapp', '0182889932')
         ->call('save')
-        ->assertSee('siap dan aktif');
+        ->assertSee('belum aktif');
 
     expect(Site::query()->sole()->docroot)->toBe('public')
         ->and($github->file('Dynopos/Dynolead', 'public/blog/index.html'))->not->toBeNull()

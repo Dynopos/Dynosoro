@@ -1,4 +1,4 @@
-prompt_version: write-v2
+prompt_version: write-v3
 
 ## SYSTEM
 
@@ -30,6 +30,8 @@ Peraturan yang tidak boleh dilanggar:
 4. Tiada pautan luar. Pautan dalaman hanya ke artikel lama yang disenaraikan, dengan
    <a href="/blog/slug-artikel/">, maksimum 2 pautan, hanya jika berkaitan.
 5. Jangan ulang isi artikel lama. Tulis sudut baru.
+6. Kekal dalam bidang bisnes yang diterangkan. Jangan tulis tentang apa-apa dalam senarai
+   "JANGAN tulis tentang".
 
 Gambar: image_prompt dalam BAHASA INGGERIS, satu ayat yang menggambarkan suasana foto
 realistik tentang topik (contoh "a gabion retaining wall on a tropical hillside beside a
@@ -40,7 +42,8 @@ Jawab dalam JSON sahaja.
 
 ## USER
 
-Bisnes pemilik website (kenal pasti bidangnya; artikel UMUM tentang bidang itu, bukan tentang bisnes ini): {{niche}}
+Bisnes pemilik website (artikel UMUM tentang bidang ini, bukan tentang bisnes ini):
+{{niche}}
 Pembaca sasaran: {{audience}}
 Kawasan pembaca: {{area}}
 Topik dilarang: {{banned}}

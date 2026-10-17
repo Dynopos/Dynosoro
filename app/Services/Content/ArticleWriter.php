@@ -65,7 +65,7 @@ class ArticleWriter
             ->map(fn ($p) => '- '.$p)->implode("\n");
 
         $prompt = $this->prompts->render('write', [], [
-            'niche' => $site->niche,
+            'niche' => $site->fieldContext(),
             'audience' => $site->audience ?: '-',
             'area' => $site->area ?: 'Malaysia',
             'banned' => $site->banned_topics ?: '-',

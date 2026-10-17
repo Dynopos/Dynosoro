@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use App\Enums\SiteStatus;
 use App\Models\Site;
+use App\Services\Content\SiteAnalyst;
+use App\Services\Content\TopicPlanner;
 use App\Services\Sites\SiteService;
 use Carbon\Carbon;
 use Livewire\Attributes\Layout;
@@ -24,6 +26,9 @@ class SitesPage extends Component
     public ?string $flash = null;
 
     public ?string $flashType = null;
+
+    /** Owner's correction per website, sent with "Analisis semula". */
+    public array $corrections = [];
 
     public function create(): void
     {
@@ -48,7 +53,7 @@ class SitesPage extends Component
         $this->editingId = null;
     }
 
-    public function save(SiteService $sites): void
+    public function save(SiteService $sites, SiteAnalyst $analyst): void
     {
         $rules = collect(SiteService::rules())->mapWithKeys(fn ($rule, $key) => ['form.'.$key => $rule])->all();
         $messages = collect(SiteService::messages())->mapWithKeys(fn ($m, $key) => [str_contains($key, '.') ? 'form.'.$key : $key => $m])->all();
@@ -65,7 +70,14 @@ class SitesPage extends Component
             return;
         }
 
-        // New website: check the repo, install the blog and activate in one go.
+        // New website: understand the business first (read from the website itself), then
+        // check the repo and install the blog. It goes live once the analysis is confirmed.
+        try {
+            $analyst->analyse($site);
+        } catch (Throwable $e) {
+            report($e);
+        }
+
         $problem = $sites->setUp($site);
 
         $problem === null
@@ -98,8 +110,39 @@ class SitesPage extends Component
             return;
         }
 
+        if (! $site->hasConfirmedAnalysis()) {
+            $this->say('Sahkan analisis bisnes dahulu, supaya artikel kena dengan bidang bisnes ini.', 'warning');
+
+            return;
+        }
+
         $sites->activate($site);
         $this->say("{$site->name} aktif. Artikel pertama akan ditulis dalam 15 minit.");
+    }
+
+    public function analyse(SiteAnalyst $analyst, int $id): void
+    {
+        $site = Site::query()->findOrFail($id);
+
+        $this->attempt(function () use ($analyst, $site) {
+            $analyst->analyse($site, $this->corrections[$site->id] ?? null);
+            unset($this->corrections[$site->id]);
+        }, 'Analisis bisnes siap. Semak, dan tekan "Betul, sahkan" jika tepat.');
+    }
+
+    public function confirmAnalysis(SiteAnalyst $analyst, TopicPlanner $planner, int $id): void
+    {
+        $site = Site::query()->findOrFail($id);
+
+        if ($site->analysis === null) {
+            $this->say('Tiada analisis untuk disahkan. Tekan Analisis bisnes dahulu.', 'warning');
+
+            return;
+        }
+
+        $analyst->confirm($site);
+        $dropped = $planner->dropOffField($site->refresh());
+        $this->say("Analisis {$site->name} disahkan. Topik baru akan dirancang ikut bidang ini.".($dropped ? " {$dropped} topik lama yang tersasar bidang dibuang." : '').($site->status === SiteStatus::Active ? '' : ' Tekan Aktifkan untuk mula.'));
     }
 
     public function pause(SiteService $sites, int $id): void
