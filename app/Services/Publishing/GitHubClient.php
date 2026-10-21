@@ -166,9 +166,45 @@ class GitHubClient
     {
         return match ($response->status()) {
             401 => 'Token GitHub tidak sah atau sudah tamat. Buat token baru dan kemas kini GITHUB_TOKEN.',
-            403 => 'GitHub tolak (403): token tiada kebenaran, atau had kadar GitHub dicapai.',
-            default => 'GitHub gagal ('.$response->status().'): '.mb_substr((string) ($response->json('message') ?? $response->body()), 0, 200),
+            403 => $this->describeForbidden($response),
+            default => 'GitHub gagal ('.$response->status().'): '.$this->githubMessage($response),
         };
+    }
+
+    /**
+     * A 403 has several unrelated causes, each fixed somewhere different. Name the cause
+     * and keep GitHub's own message, so the admin knows which setting to open.
+     */
+    private function describeForbidden(Response $response): string
+    {
+        $message = $this->githubMessage($response);
+        $lower = mb_strtolower($message);
+
+        if ($response->header('x-ratelimit-remaining') === '0' || str_contains($lower, 'rate limit')) {
+            $reset = (int) $response->header('x-ratelimit-reset');
+            $when = $reset > 0 ? ' Cuba semula selepas '.now()->setTimestamp($reset)->timezone(config('app.timezone'))->format('H:i').'.' : ' Cuba semula sejam lagi.';
+
+            return 'GitHub tolak (403): had kadar GitHub dicapai.'.$when;
+        }
+
+        $cause = match (true) {
+            str_contains($lower, 'forbids access via a fine-grained personal access') => 'Organisasi GitHub menyekat token fine-grained. Buka organisasi → Settings → Personal access tokens → benarkan token fine-grained.',
+            str_contains($lower, 'approv') || str_contains($lower, 'pending') => 'Token menunggu kelulusan organisasi. Buka organisasi → Settings → Personal access tokens → Pending requests → luluskan token dynoseo.',
+            str_contains($lower, 'not accessible by personal access token') => 'Token tiada akses tulis ke repo ini. Edit token dynoseo: tambah repo ini, dan Contents = Read and write.',
+            default => 'Token tiada kebenaran untuk tindakan ini.',
+        };
+
+        $needed = (string) $response->header('x-accepted-github-permissions');
+
+        return 'GitHub tolak (403): '.$cause
+            .($needed !== '' ? ' Kebenaran diperlukan: '.$needed.'.' : '')
+            .($message !== '' ? ' Mesej GitHub: "'.$message.'"' : '');
+    }
+
+    /** GitHub's own error message, short. It never contains the token. */
+    private function githubMessage(Response $response): string
+    {
+        return trim(mb_substr((string) ($response->json('message') ?? $response->body()), 0, 200));
     }
 
     private function encodePath(string $path): string
