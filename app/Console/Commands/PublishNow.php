@@ -18,6 +18,12 @@ class PublishNow extends Command
         $site = Site::query()->withoutGlobalScope('workspace')->findOrFail((int) $this->argument('site'));
         $article = $current->runAs($site->workspace_id, fn () => $runner->run($site, true));
 
+        if ($article === null && $runner->busy) {
+            $this->error('Website ini sedang ditulis oleh proses lain. Tunggu beberapa minit, kemudian semak skrin Artikel.');
+
+            return self::FAILURE;
+        }
+
         if ($article === null) {
             $this->error('Tiada artikel diterbitkan: '.($site->fresh()->status_note ?? '-'));
 
