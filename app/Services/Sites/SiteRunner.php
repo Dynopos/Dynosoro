@@ -14,6 +14,7 @@ use App\Services\Content\ArticleProducer;
 use App\Services\Publishing\SitePublisher;
 use App\Support\AdminAlert;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 /**
@@ -30,8 +31,33 @@ class SiteRunner
         private AdminAlert $alert,
     ) {}
 
-    /** Returns the published article, or null when nothing was published. */
+    /** True when the last run() skipped because another run for the same website was going. */
+    public bool $busy = false;
+
+    /**
+     * Returns the published article, or null when nothing was published.
+     *
+     * One run per website at a time. Without this lock, "Terbit sekarang", the scheduler and
+     * `dynoseo:publish` could run together: both see no topics, both plan the same topic, and
+     * the same article is written (and paid for) twice.
+     */
     public function run(Site $site, bool $manual = false): ?Article
+    {
+        $lock = Cache::lock('site-run:'.$site->id, (int) config('dynoseo.articles.run_lock_seconds', 1800));
+        $this->busy = ! $lock->get();
+
+        if ($this->busy) {
+            return null;
+        }
+
+        try {
+            return $this->runLocked($site->refresh(), $manual);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    private function runLocked(Site $site, bool $manual): ?Article
     {
         if ($site->status !== SiteStatus::Active && ! $manual) {
             return null;

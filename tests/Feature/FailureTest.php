@@ -5,6 +5,7 @@ use App\Enums\SiteStatus;
 use App\Jobs\PublishSiteArticle;
 use App\Models\Article;
 use App\Models\Site;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
 it('pauses every website and alerts Bob once when the GCP credit runs out', function () {
@@ -109,4 +110,25 @@ it('marks a half-written draft as failed when Vertex errors, keeping the topic f
     expect($article->status)->toBe(ArticleStatus::Failed)
         ->and($article->topic->status)->toBe('planned')
         ->and($site->fresh()->failure_count)->toBe(1);
+});
+
+it('never runs the same website twice at once, so a topic is not written twice', function () {
+    $github = fakeGitHub([]);
+    $site = makeSite();
+    fakeVertex(github: $github);
+
+    // Another run (queue worker, scheduler or dynoseo:publish) holds the website.
+    $other = Cache::lock('site-run:'.$site->id, 60);
+    $other->get();
+
+    PublishSiteArticle::dispatchSync($site->id);
+
+    expect(vertexCalls())->toBe(0)
+        ->and($github->commits)->toBe([])
+        ->and(Article::query()->count())->toBe(0);
+
+    $other->release();
+    PublishSiteArticle::dispatchSync($site->id);
+
+    expect(Article::query()->published()->count())->toBe(1);
 });
