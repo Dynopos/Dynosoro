@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Http;
  */
 class GitHubClient
 {
-    /** Repo exists, token can push, and the branch exists. Returns a problem in BM, or null. */
+    /** Repo exists, the branch exists, and the token can really write. Returns a problem in BM, or null. */
     public function checkAccess(string $repo, string $branch): ?string
     {
         $response = $this->http()->get("/repos/{$repo}");
@@ -37,7 +37,20 @@ class GitHubClient
             return "Branch {$branch} tiada dalam {$repo}.";
         }
 
-        return $branchResponse->failed() ? $this->describe($branchResponse) : null;
+        if ($branchResponse->failed()) {
+            return $this->describe($branchResponse);
+        }
+
+        // permissions.push is the USER's role, not what a fine-grained token may do: a
+        // token without Contents write (or still awaiting organisation approval) passes
+        // every read above and only fails when publishing. Prove write access for real by
+        // creating a blob. A blob outside any commit changes nothing in the repo.
+        $writeResponse = $this->http()->post("/repos/{$repo}/git/blobs", [
+            'content' => base64_encode('dynoseo access check'),
+            'encoding' => 'base64',
+        ]);
+
+        return $writeResponse->failed() ? $this->describe($writeResponse) : null;
     }
 
     /** @return array{content:string, sha:string}|null */
