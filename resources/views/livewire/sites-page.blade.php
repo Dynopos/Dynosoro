@@ -61,6 +61,9 @@
                     <x-field label="Topik dilarang" name="form.banned_topics" hint="Pisahkan dengan koma.">
                         <input type="text" wire:model="form.banned_topics" class="input" placeholder="harga, nama pesaing">
                     </x-field>
+                    <x-field label="Keyword sasaran (maksimum 5)" name="form.target_keywords" hint="Satu keyword setiap baris. Setiap satu dapat artikel dahulu, sebelum topik lain.">
+                        <textarea wire:model="form.target_keywords" rows="3" class="input" placeholder="sistem pos kedai runcit&#10;sistem pos kelantan"></textarea>
+                    </x-field>
 
                     <p class="label pt-1">Hook bawah artikel</p>
                     <x-field label="Tajuk" name="form.cta_title" hint="Kosong = 'Berminat dengan (nama bisnes)?'">
@@ -134,6 +137,7 @@
                     <p class="mt-2 text-sm"><b>{{ $a['field'] }}</b>: {{ $a['summary'] }}</p>
                     @if ($a['services'])<p class="mt-1.5 text-xs text-slate-600"><b>Perkhidmatan:</b> {{ implode(', ', $a['services']) }}</p>@endif
                     <p class="mt-1.5 text-xs text-slate-600"><b>Kluster topik:</b> {{ collect($a['pillars'])->pluck('name')->implode(' · ') }}</p>
+                    @if ($site->targetKeywords())<p class="mt-1.5 text-xs text-slate-600"><b>Keyword sasaran:</b> {{ implode(' · ', $site->targetKeywords()) }}</p>@endif
                     @if ($a['avoid'])<p class="mt-1.5 text-xs text-rose-700"><b>Tak akan ditulis:</b> {{ implode(', ', $a['avoid']) }}</p>@endif
                     @if ($a['confidence'] !== 'tinggi' && $a['question'])
                         <p class="mt-2 rounded-lg bg-white p-2 text-xs text-amber-900 ring-1 ring-inset ring-amber-200"><b>AI kurang pasti:</b> {{ $a['question'] }}</p>

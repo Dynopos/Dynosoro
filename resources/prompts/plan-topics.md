@@ -1,4 +1,4 @@
-prompt_version: plan-v3
+prompt_version: plan-v4
 
 ## SYSTEM
 
@@ -20,6 +20,9 @@ Peraturan:
 - Jika senarai "Kluster topik yang dibenarkan" diberi: setiap topik MESTI dalam salah satu
   kluster itu, dan `cluster` diisi dengan nama kluster itu TEPAT seperti ditulis. Jangan
   cadangkan apa-apa yang tersenarai dalam "JANGAN tulis tentang".
+- Jika "Keyword sasaran pemilik" diberi: buat SATU topik untuk SETIAP keyword itu dahulu, dengan
+  `target_keyword` diisi keyword itu TEPAT seperti ditulis, dan tajuk yang menjawab carian itu.
+  Topik ini dikira dalam jumlah yang diminta.
 
 Jawab dalam JSON sahaja.
 
@@ -30,6 +33,9 @@ Bisnes pemilik website (artikel UMUM tentang bidang ini, bukan tentang bisnes in
 Pembaca sasaran: {{audience}}
 Kawasan: {{area}}
 Topik dilarang: {{banned}}
+
+Keyword sasaran pemilik (satu topik untuk setiap satu, dahulu):
+{{targets}}
 
 Tajuk sedia ada (jangan ulang):
 {{existing}}

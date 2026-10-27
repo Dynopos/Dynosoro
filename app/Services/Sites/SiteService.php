@@ -32,6 +32,7 @@ class SiteService
             'audience' => 'nullable|string|max:500',
             'area' => 'nullable|string|max:190',
             'banned_topics' => 'nullable|string|max:1000',
+            'target_keywords' => 'nullable|string|max:600',
             'frequency_days' => 'required|integer|min:1|max:30',
             'paid_until' => 'nullable|date',
             // Hook fields are optional: empty ones get a standard hook (defaultCta()).
@@ -71,6 +72,7 @@ class SiteService
             'audience' => $site?->audience ?? '',
             'area' => $site?->area ?? '',
             'banned_topics' => $site?->banned_topics ?? '',
+            'target_keywords' => implode("\n", $site?->targetKeywords() ?? []),
             'frequency_days' => $site?->frequency_days ?? (int) config('dynoseo.articles.default_frequency_days'),
             'paid_until' => $site?->paid_until?->toDateString() ?? '',
             'cta_title' => $cta['title'] ?? '',
@@ -90,6 +92,8 @@ class SiteService
             throw ValidationException::withMessages(['form.cta_whatsapp' => 'Isi nombor WhatsApp telefon bimbit (01x...) atau pautan hook.']);
         }
 
+        $keywords = $this->targetKeywords((string) ($data['target_keywords'] ?? ''), $site);
+
         $attributes = [
             'name' => Str::squish($data['name']),
             'domain' => Str::lower(rtrim(preg_replace('#^https?://#i', '', trim($data['domain'])), '/')),
@@ -100,6 +104,7 @@ class SiteService
             'audience' => trim((string) ($data['audience'] ?? '')) ?: null,
             'area' => trim((string) ($data['area'] ?? '')) ?: null,
             'banned_topics' => trim((string) ($data['banned_topics'] ?? '')) ?: null,
+            'target_keywords' => $keywords ?: null,
             'frequency_days' => (int) $data['frequency_days'],
             'paid_until' => ($data['paid_until'] ?? '') ?: null,
             'cta' => [
@@ -121,6 +126,38 @@ class SiteService
         $site->update($attributes);
 
         return $site;
+    }
+
+    /**
+     * One keyword per line (or comma), at most `max_target_keywords`. A keyword that touches the
+     * confirmed "do not write about" list or a banned topic is refused (rule 9).
+     *
+     * @return array<int, string>
+     */
+    private function targetKeywords(string $text, ?Site $site): array
+    {
+        $max = (int) config('dynoseo.articles.max_target_keywords', 5);
+        $keywords = collect(preg_split('/[,\n]+/', $text))
+            ->map(fn ($k) => Str::squish((string) $k))
+            ->filter()
+            ->unique(fn ($k) => mb_strtolower($k))
+            ->values();
+
+        $problem = match (true) {
+            $keywords->count() > $max => "Maksimum {$max} keyword.",
+            $keywords->contains(fn ($k) => mb_strlen($k) > 80) => 'Setiap keyword maksimum 80 aksara.',
+            default => null,
+        };
+
+        $blocked = array_map('mb_strtolower', array_merge($site?->avoidList() ?? [], $site?->bannedTopicList() ?? []));
+        $clash = $keywords->first(fn ($k) => collect($blocked)->contains(fn ($b) => $b !== '' && str_contains(mb_strtolower($k), $b)));
+        $problem ??= $clash !== null ? "Keyword \"{$clash}\" menyentuh topik yang tidak boleh ditulis untuk website ini." : null;
+
+        if ($problem !== null) {
+            throw ValidationException::withMessages(['form.target_keywords' => $problem]);
+        }
+
+        return $keywords->all();
     }
 
     /** Standard hook when Bob leaves the hook fields empty (a template, not AI: rule 1). */

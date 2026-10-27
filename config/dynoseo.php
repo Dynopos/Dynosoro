@@ -47,6 +47,8 @@ return [
         'max_words' => 1500,
         'topics_per_plan' => 20,
         'refill_below' => 5,
+        // Keywords the admin wants a website to rank for; each gets a topic before the rest.
+        'max_target_keywords' => 5,
         'max_per_site_per_day' => (int) env('MAX_ARTICLES_PER_SITE_PER_DAY', 1),
         'default_frequency_days' => 2,
         // Random publish time between these hours (Asia/Kuala_Lumpur), spec §4.10.

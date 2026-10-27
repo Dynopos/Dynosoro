@@ -1,5 +1,16 @@
 # Changelog
 
+## Keyword sasaran — 2026-10-27
+
+- Borang website ada medan **Keyword sasaran** (maksimum 5, satu setiap baris). Setiap keyword
+  dapat satu topik **sebelum** topik lain dalam giliran, dan ditunjuk pada kad website.
+- Perancang topik (`plan-v4`) diberi keyword yang belum ada topik. Jika AI tertinggal satu,
+  kod tambah topik dengan keyword itu sendiri sebagai tajuk (sumber `target`), supaya
+  perancangan tidak berulang dan tiada kos AI berganda.
+- Keyword yang menyentuh senarai "jangan tulis" analisis atau topik dilarang ditolak semasa
+  simpan (peraturan 9). Keyword pilihan admin tidak perlu padan kluster topik.
+- Simpan borang terus rancang topik untuk keyword baru (satu panggilan AI).
+
 ## Carian AI (ChatGPT, Gemini) — 2026-10-27
 
 - **robots.txt dynoseo.my** kini benarkan `/blog/` dan `/llms.txt`. Sebelum ini blog Dyno SEO

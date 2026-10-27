@@ -53,7 +53,7 @@ class SitesPage extends Component
         $this->editingId = null;
     }
 
-    public function save(SiteService $sites, SiteAnalyst $analyst): void
+    public function save(SiteService $sites, SiteAnalyst $analyst, TopicPlanner $planner): void
     {
         $rules = collect(SiteService::rules())->mapWithKeys(fn ($rule, $key) => ['form.'.$key => $rule])->all();
         $messages = collect(SiteService::messages())->mapWithKeys(fn ($m, $key) => [str_contains($key, '.') ? 'form.'.$key : $key => $m])->all();
@@ -65,7 +65,7 @@ class SitesPage extends Component
         $this->editingId = null;
 
         if (! $site->wasRecentlyCreated) {
-            $this->say("Website {$site->name} dikemas kini. Tekan Bina semula jika hook berubah.");
+            $this->say("Website {$site->name} dikemas kini. Tekan Bina semula jika hook berubah.".$this->planTargets($planner, $site));
 
             return;
         }
@@ -174,6 +174,24 @@ class SitesPage extends Component
     {
         $count = $sites->resumeAiPaused();
         $this->say("{$count} website disambung semula.");
+    }
+
+    /** New target keywords become topics straight away, so the admin sees them in Topik. */
+    private function planTargets(TopicPlanner $planner, Site $site): string
+    {
+        if ($site->pendingTargetKeywords() === [] || ! $site->hasConfirmedAnalysis()) {
+            return '';
+        }
+
+        try {
+            $planner->plan($site);
+        } catch (Throwable $e) {
+            report($e);
+
+            return ' Topik untuk keyword sasaran akan dirancang pada giliran seterusnya.';
+        }
+
+        return ' Topik untuk keyword sasaran dah dirancang dan akan ditulis dahulu (lihat Topik).';
     }
 
     private function attempt(callable $action, string $success): void
