@@ -7,6 +7,7 @@ use App\Models\Concerns\BelongsToWorkspace;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 /** A customer website on GitHub Pages that receives articles (spec §3.1). */
 class Site extends Model
@@ -14,7 +15,7 @@ class Site extends Model
     use BelongsToWorkspace, HasFactory;
 
     protected $fillable = [
-        'name', 'domain', 'github_repo', 'branch', 'docroot', 'niche', 'audience', 'area', 'banned_topics', 'analysis',
+        'name', 'domain', 'github_repo', 'branch', 'docroot', 'niche', 'audience', 'area', 'banned_topics', 'target_keywords', 'analysis',
         'frequency_days', 'status', 'status_note', 'failure_count', 'next_publish_at',
         'last_published_at', 'paid_until', 'cta', 'cta_bridge', 'installed_at', 'blog_pages',
     ];
@@ -32,6 +33,7 @@ class Site extends Model
             'last_published_at' => 'datetime',
             'installed_at' => 'datetime',
             'analysis' => 'array',
+            'target_keywords' => 'array',
             'analysis_confirmed_at' => 'datetime',
             'paid_until' => 'date',
         ];
@@ -126,6 +128,29 @@ class Site extends Model
         }
 
         return $this->paid_until->copy()->endOfDay()->addDays((int) config('dynoseo.articles.grace_days'))->isFuture();
+    }
+
+    /** The admin's target keywords (at most `max_target_keywords`), in the order entered. */
+    public function targetKeywords(): array
+    {
+        return collect((array) $this->target_keywords)
+            ->map(fn ($k) => Str::squish((string) $k))
+            ->filter()
+            ->unique(fn ($k) => Topic::keyFor($k))
+            ->take((int) config('dynoseo.articles.max_target_keywords', 5))
+            ->values()
+            ->all();
+    }
+
+    /** Target keywords that no topic (planned or written) covers yet. */
+    public function pendingTargetKeywords(): array
+    {
+        $covered = $this->topics()->where('status', '!=', 'skipped')->pluck('keyword_key')->all();
+
+        return array_values(array_filter(
+            $this->targetKeywords(),
+            fn ($k) => ! in_array(Topic::keyFor($k), $covered, true)
+        ));
     }
 
     public function bannedTopicList(): array

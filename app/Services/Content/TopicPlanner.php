@@ -44,10 +44,17 @@ class TopicPlanner
         return $site->topics()->where('status', 'planned')->count();
     }
 
-    /** Plan more topics when fewer than `refill_below` are left. Returns the number added. */
+    /**
+     * Plan more topics when fewer than `refill_below` are left, or when a target keyword has
+     * no topic yet. Returns the number added.
+     */
     public function ensureBacklog(Site $site): int
     {
-        if ($this->plannedCount($site) >= (int) config('dynoseo.articles.refill_below') || ! $site->hasConfirmedAnalysis()) {
+        if (! $site->hasConfirmedAnalysis()) {
+            return 0;
+        }
+
+        if ($this->plannedCount($site) >= (int) config('dynoseo.articles.refill_below') && $site->pendingTargetKeywords() === []) {
             return 0;
         }
 
@@ -62,6 +69,7 @@ class TopicPlanner
         }
 
         $existing = $this->existingTitles($site);
+        $targets = $site->pendingTargetKeywords();
         $prompt = $this->prompts->render('plan-topics', [], [
             'niche' => $site->fieldContext(),
             'audience' => $site->audience ?: '-',
@@ -69,6 +77,7 @@ class TopicPlanner
             'banned' => $site->banned_topics ?: '-',
             'existing' => $existing->isEmpty() ? '-' : $existing->take(200)->map(fn ($t) => '- '.$t)->implode("\n"),
             'count' => (int) config('dynoseo.articles.topics_per_plan'),
+            'targets' => $targets === [] ? '-' : implode("\n", array_map(fn ($k) => '- '.$k, $targets)),
         ]);
 
         $response = $this->ai->text(
@@ -96,7 +105,34 @@ class TopicPlanner
             }
         }
 
+        // A target keyword the AI left out still gets a topic (its own words as the title), so
+        // planning never repeats just to chase one keyword.
+        foreach ($site->pendingTargetKeywords() as $keyword) {
+            if (! $this->isBanned($site, $keyword) && $this->add($site, Str::ucfirst($keyword), $keyword, 'penerangan', null, 'target')) {
+                $added++;
+            }
+        }
+
+        $this->targetsFirst($site);
+
         return $added;
+    }
+
+    /** Planned topics for the admin's target keywords are written before the rest. */
+    private function targetsFirst(Site $site): void
+    {
+        $keys = array_map(fn ($k) => Topic::keyFor($k), $site->targetKeywords());
+
+        if ($keys === []) {
+            return;
+        }
+
+        $first = (int) $site->topics()->where('status', 'planned')->min('position');
+        $targets = $site->topics()->where('status', 'planned')->whereIn('keyword_key', $keys)->orderBy('position')->get();
+
+        foreach ($targets->values() as $i => $topic) {
+            $topic->forceFill(['position' => $first - $targets->count() + $i])->save();
+        }
     }
 
     /** Add one topic unless it repeats an existing topic/article or touches a banned topic. */
@@ -145,6 +181,12 @@ class TopicPlanner
             if ($avoid !== '' && str_word_count($avoid) <= 4 && str_contains($text, $avoid)) {
                 return false;
             }
+        }
+
+        // The admin chose this keyword for this website: it needs no cluster match.
+        $keywordKey = Topic::keyFor((string) ($topic['target_keyword'] ?? ''));
+        if ($keywordKey !== '' && in_array($keywordKey, array_map(fn ($k) => Topic::keyFor($k), $site->targetKeywords()), true)) {
+            return true;
         }
 
         $pillars = array_map(fn ($p) => Topic::keyFor($p), $site->pillarNames());
