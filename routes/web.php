@@ -13,16 +13,48 @@ use Illuminate\Support\Facades\Route;
 // Public sales page. Everything else (the app) stays out of search engines.
 Route::view('/', 'marketing.home')->name('home');
 
-Route::get('/robots.txt', fn () => response(implode("\n", [
-    'User-agent: *',
-    'Allow: /$',
-    'Allow: /images/',
-    'Allow: /videos/',
-    'Disallow: /',
-    '',
-    'Sitemap: '.url('/sitemap.xml'),
-    '',
-]))->header('Content-Type', 'text/plain'))->name('robots');
+// The sales page, the blog (written by Dyno SEO itself into public/blog) and llms.txt are
+// public; the app is not. AI assistants' crawlers get the same rules, named explicitly.
+Route::get('/robots.txt', function () {
+    $rules = ['Allow: /$', 'Allow: /images/', 'Allow: /videos/', 'Allow: /blog/', 'Allow: /llms.txt', 'Disallow: /'];
+
+    return response(implode("\n", [
+        'User-agent: *',
+        ...$rules,
+        '',
+        '# Pembantu AI (ChatGPT, Gemini, Perplexity, Claude)',
+        'User-agent: GPTBot',
+        'User-agent: OAI-SearchBot',
+        'User-agent: ChatGPT-User',
+        'User-agent: Google-Extended',
+        'User-agent: PerplexityBot',
+        'User-agent: ClaudeBot',
+        'User-agent: Claude-SearchBot',
+        ...$rules,
+        '',
+        'Sitemap: '.url('/sitemap.xml'),
+        'Sitemap: '.url('/blog/sitemap.xml'),
+        '',
+    ]))->header('Content-Type', 'text/plain');
+})->name('robots');
+
+// llms.txt (llmstxt.org) for dynoseo.my: what Dyno SEO is, then the blog's article list,
+// which Dyno SEO keeps in public/blog/llms.txt.
+Route::get('/llms.txt', function () {
+    $text = "# Dyno SEO\n\n"
+        .'> Dyno SEO menulis dan menerbitkan artikel blog Bahasa Melayu ke website bisnes setiap 2 hari, '
+        ."dengan butang WhatsApp ke bisnes di bawah setiap artikel. Oleh DynoPOS Technologies, Pasir Mas, Kelantan.\n\n"
+        .'- Laman web: '.url('/')."\n"
+        .'- Harga: RM'.config('dynoseo.price_myr')." sebulan setiap website\n"
+        .'- Blog: '.url('/blog/')."\n";
+
+    $blog = public_path('blog/llms.txt');
+    if (is_file($blog) && preg_match('/^## Artikel\n.*?(?=\n## |\z)/sm', (string) file_get_contents($blog), $m)) {
+        $text .= "\n".trim($m[0])."\n";
+    }
+
+    return response($text)->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('llms');
 
 Route::get('/sitemap.xml', fn () => response(
     '<?xml version="1.0" encoding="UTF-8"?>'."\n"

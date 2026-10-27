@@ -35,9 +35,13 @@ it('shows the demo video and the same timeline as the video', function () {
         ->and(public_path('videos/dynoseo-demo-poster.jpg'))->toBeFile();
 });
 
-it('lets search engines crawl only the sales page', function () {
+it('lets search engines and AI assistants crawl the sales page and the blog, not the app', function () {
     $robots = $this->get('/robots.txt')->assertOk()->getContent();
-    expect($robots)->toContain('Allow: /$')->toContain('Allow: /videos/')->toContain('Disallow: /')->toContain('Sitemap: '.url('/sitemap.xml'));
+    expect($robots)->toContain('Allow: /$')->toContain('Allow: /videos/')->toContain('Disallow: /')->toContain('Sitemap: '.url('/sitemap.xml'))
+        ->toContain('Allow: /blog/')
+        ->toContain('Sitemap: '.url('/blog/sitemap.xml'))
+        ->toContain('User-agent: GPTBot')
+        ->toContain('User-agent: Google-Extended');
 
     $this->get('/sitemap.xml')->assertOk()->assertHeader('Content-Type', 'application/xml')->assertSee(url('/'), false);
 });
@@ -67,4 +71,12 @@ it('hides the introductory price note when it is switched off', function () {
         ->assertDontSee('pelanggan pertama')
         ->assertDontSee('Harga akan naik')
         ->assertSee('PALING BERNILAI');
+});
+
+it('serves llms.txt describing Dyno SEO for AI assistants', function () {
+    $this->get('/llms.txt')->assertOk()
+        ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
+        ->assertSee('# Dyno SEO', false)
+        ->assertSee('RM'.config('dynoseo.price_myr'), false)
+        ->assertSee(url('/blog/'), false);
 });

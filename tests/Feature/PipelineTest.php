@@ -145,3 +145,61 @@ it('publishes into public/ for a Laravel website and leaves its sitemap and robo
         ->and($repo['routes/web.php'])->toBe('<?php // app')
         ->and($repo['public/blog/gabion-wall-vs-concrete-wall/index.html'])->toContain('https://dynolead.my/blog/gabion-wall-vs-concrete-wall/');
 });
+
+it('writes llms.txt and business schema so AI assistants can cite the website', function () {
+    $github = fakeGitHub([]);
+    $site = makeSite();
+    fakeVertex(github: $github);
+
+    PublishSiteArticle::dispatchSync($site->id);
+
+    $repo = $github->repos[$site->github_repo];
+    expect($repo['llms.txt'])
+        ->toStartWith('# '.$site->name)
+        ->toContain('## Artikel')
+        ->toContain('[Gabion Wall vs Concrete Wall untuk Cerun Rumah](https://'.$site->domain.'/blog/gabion-wall-vs-concrete-wall/)')
+        ->toContain('- Kawasan: Kelantan')
+        ->toContain('- Hubungi: https://wa.me/60123456789')
+        ->and($repo['blog/gabion-wall-vs-concrete-wall/index.html'])
+        ->toContain('"@id":"https://'.$site->domain.'/#business"')
+        ->toContain('"telephone":"+60123456789"')
+        ->toContain('"areaServed":"Kelantan"');
+});
+
+it('never overwrites an llms.txt the owner wrote', function () {
+    $github = fakeGitHub([]);
+    $site = makeSite([], ['llms.txt' => "# Kedai saya\n\nTulisan pemilik sendiri.\n"]);
+    fakeVertex(github: $github);
+
+    PublishSiteArticle::dispatchSync($site->id);
+
+    $repo = $github->repos[$site->github_repo];
+    expect($repo['llms.txt'])->toBe("# Kedai saya\n\nTulisan pemilik sendiri.\n")
+        ->and($repo['blog/llms.txt'])->toContain('## Artikel');
+});
+
+it('names AI crawlers in a new robots.txt, and upgrades the one the app wrote before', function () {
+    $github = fakeGitHub([]);
+    $site = makeSite(['installed_at' => null], ['robots.txt' => "User-agent: *\nAllow: /\n\nSitemap: https://gabion.example/sitemap.xml\n"]);
+    $site->update(['domain' => 'gabion.example']);
+    fakeVertex(github: $github);
+
+    PublishSiteArticle::dispatchSync($site->id);
+
+    expect($github->repos[$site->github_repo]['robots.txt'])
+        ->toContain('User-agent: GPTBot')
+        ->toContain('User-agent: Google-Extended')
+        ->toContain('Sitemap: https://gabion.example/sitemap.xml');
+});
+
+it('keeps the owner\'s own robots.txt rules', function () {
+    $github = fakeGitHub([]);
+    $site = makeSite(['installed_at' => null], ['robots.txt' => "User-agent: *\nDisallow: /admin/\n"]);
+    fakeVertex(github: $github);
+
+    PublishSiteArticle::dispatchSync($site->id);
+
+    expect($github->repos[$site->github_repo]['robots.txt'])
+        ->toStartWith("User-agent: *\nDisallow: /admin/")
+        ->not->toContain('GPTBot');
+});

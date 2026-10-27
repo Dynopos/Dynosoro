@@ -14,6 +14,9 @@ use Illuminate\Support\Collection;
  */
 class BlogRenderer
 {
+    /** Last line of every llms.txt the app writes; a root llms.txt without it is the owner's. */
+    public const LLMS_MARKER = '_Dikemas kini automatik oleh Dyno SEO._';
+
     private const MONTHS = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
 
     /** @param  Collection<int, Article>  $related */
@@ -230,11 +233,12 @@ class BlogRenderer
                 'image' => $image,
                 'datePublished' => $article->published_at?->toAtomString(),
                 'dateModified' => ($article->content_updated_at ?? $article->published_at)?->toAtomString(),
-                'author' => ['@type' => 'Organization', 'name' => $this->author($site)],
-                'publisher' => ['@type' => 'Organization', 'name' => $site->name, 'url' => $site->baseUrl().'/'],
+                'author' => ['@type' => 'Organization', 'name' => $this->author($site), 'url' => $site->baseUrl().'/'],
+                'publisher' => ['@id' => $this->businessId($site)],
                 'mainEntityOfPage' => $article->url(),
                 'inLanguage' => 'ms-MY',
             ]),
+            $this->business($site),
             [
                 '@type' => 'BreadcrumbList',
                 'itemListElement' => [
@@ -260,6 +264,86 @@ class BlogRenderer
         $json = json_encode(['@context' => 'https://schema.org', '@graph' => $graph], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP);
 
         return '<script type="application/ld+json">'.$json.'</script>';
+    }
+
+    /**
+     * Who is behind the website, for search engines and AI answers: name, field, area and
+     * contact. Only facts the admin entered or confirmed (website form, hook, analysis).
+     */
+    private function business(Site $site): array
+    {
+        $cta = (array) $site->cta;
+        $phone = MalaysianPhone::canonical($cta['whatsapp'] ?? null);
+        $summary = $site->hasConfirmedAnalysis() ? (string) ($site->analysis['summary'] ?? '') : '';
+
+        return array_filter([
+            '@type' => 'Organization',
+            '@id' => $this->businessId($site),
+            'name' => $site->name,
+            'url' => $site->baseUrl().'/',
+            'description' => $summary !== '' ? $summary : null,
+            'telephone' => $phone !== null ? '+'.$phone : null,
+            'areaServed' => filled($site->area) ? $site->area : null,
+            'knowsAbout' => $site->pillarNames() ?: null,
+        ]);
+    }
+
+    private function businessId(Site $site): string
+    {
+        return $site->baseUrl().'/#business';
+    }
+
+    /**
+     * llms.txt (llmstxt.org): a short Markdown summary of the business and its articles,
+     * written for AI assistants (ChatGPT, Gemini, Perplexity, Claude).
+     *
+     * @param  Collection<int, Article>  $published  newest first
+     */
+    public function llmsTxt(Site $site, Collection $published): string
+    {
+        $analysis = $site->hasConfirmedAnalysis() ? (array) $site->analysis : [];
+        $summary = $this->oneLine((string) ($analysis['summary'] ?? '')) ?: $this->nicheLine($site);
+        $cta = (array) $site->cta;
+        $wa = MalaysianPhone::waNumber($cta['whatsapp'] ?? null);
+        $contact = $wa !== null ? 'https://wa.me/'.$wa : trim((string) ($cta['url'] ?? ''));
+
+        $lines = ['# '.$this->oneLine($site->name), '', '> '.$summary, ''];
+        $lines[] = '- Laman web: '.$site->baseUrl().'/';
+        if (! empty($analysis['field'])) {
+            $lines[] = '- Bidang: '.$this->oneLine((string) $analysis['field']);
+        }
+        if (filled($site->area)) {
+            $lines[] = '- Kawasan: '.$this->oneLine((string) $site->area);
+        }
+        if (preg_match('#^https?://#i', $contact) === 1) {
+            $lines[] = '- Hubungi: '.$contact;
+        }
+
+        $articles = $published->take((int) config('dynoseo.articles.llms_max_articles', 100));
+        if ($articles->isNotEmpty()) {
+            $lines[] = '';
+            $lines[] = '## Artikel';
+            $lines[] = '';
+            foreach ($articles as $article) {
+                $lines[] = '- ['.$this->oneLine((string) $article->title).']('.$article->url().')'
+                    .($article->summary ? ': '.$this->oneLine((string) $article->summary) : '');
+            }
+        }
+
+        $lines[] = '';
+        $lines[] = '## Lain-lain';
+        $lines[] = '';
+        $lines[] = '- [Semua artikel]('.$site->baseUrl().'/blog/)';
+        $lines[] = '- [Sitemap blog]('.$site->baseUrl().'/blog/sitemap.xml)';
+        $lines[] = '';
+        $lines[] = self::LLMS_MARKER;
+
+        return implode("\n", $lines)."\n";
+    }
+
+    private function oneLine(string $text): string
+    {
+        return trim((string) preg_replace('/\s+/u', ' ', $text));
     }
 
     private function imageUrl(Site $site, Article $article): ?string
