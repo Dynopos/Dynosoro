@@ -20,7 +20,7 @@ class RepoGuard
             return false;
         }
 
-        if (in_array($path, ['sitemap.xml', 'sitemap-pages.xml', 'robots.txt', 'index.html'], true)) {
+        if (in_array($path, ['sitemap.xml', 'sitemap-pages.xml', 'robots.txt', 'index.html', 'llms.txt'], true)) {
             return true;
         }
 

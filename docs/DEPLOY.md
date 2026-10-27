@@ -170,6 +170,11 @@ user `forge`, **Every Minute**.
 7. **Aktifkan**. Artikel pertama ditulis dalam 15 minit, kemudian setiap 2 hari pada waktu
    rawak 8 pagi – 9 malam. **Terbit sekarang** untuk ujian segera.
 8. Google: tambah domain di Google Search Console dan hantar `https://domain/sitemap.xml`.
+9. Bing (sumber utama ChatGPT): bing.com/webmasters → tambah domain (paling mudah: *Import from
+   Google Search Console*) → hantar sitemap yang sama.
+10. IndexNow (Bing diberitahu serta-merta bila artikel terbit): isi `INDEXNOW_KEY` sekali sahaja
+    (lihat langkah 3), kemudian tekan **Pasang blog** semula untuk setiap website supaya fail
+    kunci di-commit.
 
 ### 8b. Website Laravel di Forge (contoh dynolead.my)
 

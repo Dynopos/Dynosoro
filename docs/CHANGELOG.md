@@ -1,5 +1,18 @@
 # Changelog
 
+## Carian AI (ChatGPT, Gemini) — 2026-10-27
+
+- **robots.txt dynoseo.my** kini benarkan `/blog/` dan `/llms.txt`. Sebelum ini blog Dyno SEO
+  sendiri disekat (`Disallow: /`) daripada semua enjin carian. Sitemap blog disebut juga.
+- **Bot AI dinamakan** (GPTBot, OAI-SearchBot, ChatGPT-User, Google-Extended, PerplexityBot,
+  ClaudeBot, Claude-SearchBot) dalam robots.txt yang app cipta. robots.txt yang dicipta oleh
+  versi lama app dinaik taraf semasa "Pasang blog"; robots.txt milik pemilik tidak diubah.
+- **llms.txt** (llmstxt.org) setiap website: ringkasan bisnes (dari analisis disahkan), kawasan,
+  WhatsApp, dan senarai artikel. Di root untuk website statik; di `/blog/llms.txt` untuk app
+  Laravel atau bila pemilik sudah ada llms.txt sendiri. dynoseo.my hidangkan `/llms.txt`.
+- **Schema Organization** dalam setiap artikel: nama, bidang (ringkasan analisis), kawasan,
+  telefon WhatsApp, kluster topik (`knowsAbout`). Hanya fakta yang admin isi atau sahkan.
+
 ## Analisis bisnes — 2026-10-17
 
 Punca: dalam demo kepada pelanggan skylift, app merancang posting tentang oksigen. AI hanya

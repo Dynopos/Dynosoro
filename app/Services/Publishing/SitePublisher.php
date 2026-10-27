@@ -19,6 +19,16 @@ use Throwable;
  */
 class SitePublisher
 {
+    /**
+     * AI assistants' crawlers, allowed by name in a robots.txt the app creates, so answers in
+     * ChatGPT, Gemini, Perplexity and Claude can cite the website. A robots.txt the owner
+     * already has keeps its own rules (rule 5): the app only adds the sitemap line there.
+     */
+    public const AI_CRAWLERS = "# Pembantu AI (ChatGPT, Gemini, Perplexity, Claude)\n"
+        ."User-agent: GPTBot\nUser-agent: OAI-SearchBot\nUser-agent: ChatGPT-User\n"
+        ."User-agent: Google-Extended\nUser-agent: PerplexityBot\n"
+        ."User-agent: ClaudeBot\nUser-agent: Claude-SearchBot\nAllow: /\n";
+
     /** index.html as read for this commit, so RepoGuard can check only the block changed. */
     private ?string $originalHome = null;
 
@@ -81,8 +91,12 @@ class SitePublisher
 
         $robots = $this->github->getFile($site->github_repo, $site->branch, 'robots.txt');
         $sitemapLine = 'Sitemap: '.$site->baseUrl().'/sitemap.xml';
-        if ($robots === null) {
-            $files['robots.txt'] = "User-agent: *\nAllow: /\n\n{$sitemapLine}\n";
+        $default = "User-agent: *\nAllow: /\n\n".self::AI_CRAWLERS."\n{$sitemapLine}\n";
+        $oldDefault = "User-agent: *\nAllow: /\n\n{$sitemapLine}\n";
+
+        // Missing, or the one an earlier version of the app wrote: use the current default.
+        if ($robots === null || $robots['content'] === $oldDefault) {
+            $files['robots.txt'] = $default;
         } elseif (! str_contains($robots['content'], $sitemapLine)) {
             $files['robots.txt'] = rtrim($robots['content'])."\n\n{$sitemapLine}\n";
         }
@@ -220,6 +234,7 @@ class SitePublisher
 
         $files['blog/sitemap.xml'] = $this->renderer->sitemap($site, $published);
         $files['blog/feed.xml'] = $this->renderer->feed($site, $published);
+        $files[$this->llmsPath($site)] = $this->renderer->llmsTxt($site, $published);
 
         $home = $this->github->getFile($site->github_repo, $site->branch, $site->repoPath('index.html'));
         if ($home !== null && RepoGuard::hasBlock($home['content'])) {
@@ -231,6 +246,23 @@ class SitePublisher
         $site->blog_pages = $pages;
 
         return $files;
+    }
+
+    /**
+     * llms.txt belongs at the web root. A Laravel app's root is its own (routes), and a root
+     * llms.txt the owner wrote is never overwritten (rule 5): then it goes under /blog/.
+     */
+    private function llmsPath(Site $site): string
+    {
+        if (! $site->ownsRootFiles()) {
+            return 'blog/llms.txt';
+        }
+
+        $existing = $this->github->getFile($site->github_repo, $site->branch, 'llms.txt');
+
+        return $existing === null || str_contains($existing['content'], BlogRenderer::LLMS_MARKER)
+            ? 'llms.txt'
+            : 'blog/llms.txt';
     }
 
     private function commit(Site $site, ?Article $article, string $action, array $files, string $message): string
