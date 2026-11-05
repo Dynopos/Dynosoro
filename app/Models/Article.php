@@ -17,7 +17,7 @@ class Article extends Model
         'site_id', 'topic_id', 'title', 'slug', 'meta_description', 'summary', 'body_html', 'faq',
         'cta_bridge', 'image_prompt', 'image_path', 'image_alt', 'word_count', 'status', 'source',
         'attempts', 'check_notes', 'error', 'prompt_version', 'commit_sha', 'published_at',
-        'content_updated_at',
+        'content_updated_at', 'gbp_post', 'gbp_posted_at', 'gbp_error',
     ];
 
     protected function casts(): array
@@ -30,6 +30,7 @@ class Article extends Model
             'attempts' => 'integer',
             'published_at' => 'datetime',
             'content_updated_at' => 'datetime',
+            'gbp_posted_at' => 'datetime',
         ];
     }
 

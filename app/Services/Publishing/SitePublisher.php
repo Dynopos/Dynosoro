@@ -3,6 +3,7 @@
 namespace App\Services\Publishing;
 
 use App\Enums\ArticleStatus;
+use App\Jobs\PostArticleToGoogle;
 use App\Models\Article;
 use App\Models\PublishLog;
 use App\Models\Site;
@@ -128,6 +129,11 @@ class SitePublisher
         $article->forceFill(['commit_sha' => $sha])->save();
         $site->forceFill(['last_published_at' => now()])->save();
         $this->indexNow->submit($site->host(), [$article->url(), $site->baseUrl().'/blog/']);
+
+        // One Google Business Profile post, after the website has had time to deploy.
+        if (filled($site->gbp_location)) {
+            PostArticleToGoogle::dispatch($article->id)->delay(now()->addMinutes((int) config('dynoseo.gbp.post_delay_minutes', 15)));
+        }
 
         return $sha;
     }

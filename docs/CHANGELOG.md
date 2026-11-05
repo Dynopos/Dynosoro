@@ -1,5 +1,19 @@
 # Changelog
 
+## Google Business Profile — 2026-11-05
+
+- **Post ke Google** untuk setiap artikel yang terbit: ringkasan artikel, gambar, butang
+  "Ketahui lagi" ke artikel. Tiada panggilan AI. Dihantar 15 minit selepas terbit (website
+  sempat deploy). Nombor telefon dan pautan dibuang dari teks (Google menolaknya).
+- Satu akaun Google admin setiap workspace (`google_connections`, token disulitkan), disambung
+  melalui OAuth dengan semakan `state`. Pelanggan tambah akaun itu sebagai Manager profil.
+- Borang website: pilih **Profil Google** dari senarai profil yang akaun itu urus (hanya dari
+  senarai). Kad website tunjuk profil yang dipilih.
+- Skrin Artikel: "Dipost ke Google", ralat Google, dan butang **Post ke Google** (cuba semula,
+  atau artikel lama). Tiada post berganda.
+- Semua panggilan melalui `GoogleBusinessClient`. Ciri tutup selagi kunci OAuth kosong.
+  Belum diuji dengan Google sebenar (menunggu kelulusan akses API).
+
 ## Keyword sasaran — 2026-10-27
 
 - Borang website ada medan **Keyword sasaran** (maksimum 5, satu setiap baris). Setiap keyword

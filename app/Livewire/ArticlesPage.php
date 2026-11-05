@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Enums\ArticleStatus;
 use App\Models\Article;
 use App\Models\Site;
+use App\Services\Google\GbpPoster;
+use App\Services\Google\GoogleBusinessClient;
 use App\Services\Sites\ArticleService;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
@@ -83,6 +85,21 @@ class ArticlesPage extends Component
         }, 'Gambar baru dijana.');
     }
 
+    public function postToGoogle(GbpPoster $poster, int $id): void
+    {
+        $article = Article::query()->findOrFail($id);
+
+        if ($poster->post($article)) {
+            $this->flash = 'Dipost ke Google Business Profile.';
+            $this->flashType = 'success';
+
+            return;
+        }
+
+        $this->flash = $article->refresh()->gbp_error ?? 'Artikel ini tidak boleh dipost ke Google.';
+        $this->flashType = 'danger';
+    }
+
     private function attempt(callable $action, string $success): void
     {
         try {
@@ -108,6 +125,7 @@ class ArticlesPage extends Component
                 ->orderByRaw('published_at IS NULL DESC')
                 ->latest('published_at')->latest('id')
                 ->paginate(15),
+            'googleConfigured' => app(GoogleBusinessClient::class)->configured(),
         ]);
     }
 }

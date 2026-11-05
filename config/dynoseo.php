@@ -73,5 +73,12 @@ return [
 
     'indexnow_key' => env('INDEXNOW_KEY'),
 
+    // Google Business Profile: one post per published article. The delay lets the website
+    // deploy first, so the article link and image already work when Google fetches them.
+    'gbp' => [
+        'post_delay_minutes' => (int) env('GBP_POST_DELAY_MINUTES', 15),
+        'max_chars' => 1500,
+    ],
+
     'price_table_path' => env('PRICE_TABLE_PATH', 'config/ai_prices.php'),
 ];

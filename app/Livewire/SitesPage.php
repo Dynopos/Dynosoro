@@ -3,11 +3,15 @@
 namespace App\Livewire;
 
 use App\Enums\SiteStatus;
+use App\Exceptions\GoogleBusinessException;
+use App\Models\GoogleConnection;
 use App\Models\Site;
 use App\Services\Content\SiteAnalyst;
 use App\Services\Content\TopicPlanner;
+use App\Services\Google\GoogleBusinessClient;
 use App\Services\Sites\SiteService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -30,12 +34,18 @@ class SitesPage extends Component
     /** Owner's correction per website, sent with "Analisis semula". */
     public array $corrections = [];
 
+    /** Business Profiles the connected Google account manages, for the website form. */
+    public array $gbpLocations = [];
+
+    public ?string $gbpError = null;
+
     public function create(): void
     {
         $this->editingId = null;
         $this->form = SiteService::form();
         $this->showForm = true;
         $this->resetErrorBag();
+        $this->loadGbpLocations();
     }
 
     public function edit(int $id): void
@@ -45,6 +55,7 @@ class SitesPage extends Component
         $this->form = SiteService::form($site);
         $this->showForm = true;
         $this->resetErrorBag();
+        $this->loadGbpLocations();
     }
 
     public function cancel(): void
@@ -55,6 +66,21 @@ class SitesPage extends Component
 
     public function save(SiteService $sites, SiteAnalyst $analyst, TopicPlanner $planner): void
     {
+        $this->form['gbp_location'] = (string) ($this->form['gbp_location'] ?? '');
+        $chosen = collect($this->gbpLocations)->firstWhere('name', $this->form['gbp_location']);
+        $current = $this->editingId ? (string) Site::query()->whereKey($this->editingId)->value('gbp_location') : '';
+
+        // Only a profile the connected account manages (or the one already saved) can be chosen.
+        if ($this->form['gbp_location'] !== '' && $chosen === null && $this->form['gbp_location'] !== $current) {
+            $this->addError('form.gbp_location', 'Pilih profil dari senarai.');
+
+            return;
+        }
+
+        if ($chosen !== null) {
+            $this->form['gbp_title'] = $chosen['title'];
+        }
+
         $rules = collect(SiteService::rules())->mapWithKeys(fn ($rule, $key) => ['form.'.$key => $rule])->all();
         $messages = collect(SiteService::messages())->mapWithKeys(fn ($m, $key) => [str_contains($key, '.') ? 'form.'.$key : $key => $m])->all();
         $data = $this->validate($rules, $messages)['form'];
@@ -194,6 +220,25 @@ class SitesPage extends Component
         return ' Topik untuk keyword sasaran dah dirancang dan akan ditulis dahulu (lihat Topik).';
     }
 
+    /** Profiles for the form. Cached 10 minutes; a Google error is shown, never fatal. */
+    private function loadGbpLocations(): void
+    {
+        $this->gbpLocations = [];
+        $this->gbpError = null;
+        $google = app(GoogleBusinessClient::class);
+        $connection = GoogleConnection::query()->first();
+
+        if (! $google->configured() || $connection === null) {
+            return;
+        }
+
+        try {
+            $this->gbpLocations = Cache::remember('gbp-locations:'.$connection->id, now()->addMinutes(10), fn () => $google->locations($connection));
+        } catch (GoogleBusinessException $e) {
+            $this->gbpError = $e->getMessage();
+        }
+    }
+
     private function attempt(callable $action, string $success): void
     {
         try {
@@ -222,6 +267,9 @@ class SitesPage extends Component
             ])->orderBy('name')->get(),
             'aiPaused' => Site::query()->where('status', SiteStatus::AiPaused)->count(),
             'tokenExpires' => $expires ? Carbon::parse($expires) : null,
+            'googleConfigured' => app(GoogleBusinessClient::class)->configured(),
+            'googleConnection' => GoogleConnection::query()->first(),
+            'googleFlash' => session('google_flash'),
         ]);
     }
 }
