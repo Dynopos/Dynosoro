@@ -15,7 +15,7 @@ class Site extends Model
     use BelongsToWorkspace, HasFactory;
 
     protected $fillable = [
-        'name', 'domain', 'github_repo', 'branch', 'docroot', 'niche', 'audience', 'area', 'banned_topics', 'target_keywords', 'analysis',
+        'name', 'domain', 'github_repo', 'branch', 'docroot', 'niche', 'audience', 'area', 'banned_topics', 'target_keywords', 'gbp_location', 'gbp_title', 'analysis',
         'frequency_days', 'status', 'status_note', 'failure_count', 'next_publish_at',
         'last_published_at', 'paid_until', 'cta', 'cta_bridge', 'installed_at', 'blog_pages',
     ];

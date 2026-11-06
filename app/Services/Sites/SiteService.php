@@ -33,6 +33,8 @@ class SiteService
             'area' => 'nullable|string|max:190',
             'banned_topics' => 'nullable|string|max:1000',
             'target_keywords' => 'nullable|string|max:600',
+            'gbp_location' => ['nullable', 'string', 'max:190', 'regex:#^accounts/[0-9]+/locations/[0-9]+$#'],
+            'gbp_title' => 'nullable|string|max:255',
             'frequency_days' => 'required|integer|min:1|max:30',
             'paid_until' => 'nullable|date',
             // Hook fields are optional: empty ones get a standard hook (defaultCta()).
@@ -73,6 +75,8 @@ class SiteService
             'area' => $site?->area ?? '',
             'banned_topics' => $site?->banned_topics ?? '',
             'target_keywords' => implode("\n", $site?->targetKeywords() ?? []),
+            'gbp_location' => $site?->gbp_location ?? '',
+            'gbp_title' => $site?->gbp_title ?? '',
             'frequency_days' => $site?->frequency_days ?? (int) config('dynoseo.articles.default_frequency_days'),
             'paid_until' => $site?->paid_until?->toDateString() ?? '',
             'cta_title' => $cta['title'] ?? '',
@@ -105,6 +109,8 @@ class SiteService
             'area' => trim((string) ($data['area'] ?? '')) ?: null,
             'banned_topics' => trim((string) ($data['banned_topics'] ?? '')) ?: null,
             'target_keywords' => $keywords ?: null,
+            'gbp_location' => ($data['gbp_location'] ?? '') ?: null,
+            'gbp_title' => ($data['gbp_location'] ?? '') ? (trim((string) ($data['gbp_title'] ?? '')) ?: null) : null,
             'frequency_days' => (int) $data['frequency_days'],
             'paid_until' => ($data['paid_until'] ?? '') ?: null,
             'cta' => [

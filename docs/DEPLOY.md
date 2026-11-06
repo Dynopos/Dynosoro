@@ -197,6 +197,33 @@ Langganan RM59 sebulan setiap website. Bob kutip sendiri dan isi **Bayar sehingg
 borang website. Selepas tarikh itu + 7 hari, artikel berhenti ditulis (website kekal).
 Kosongkan medan itu untuk website Bob sendiri.
 
+## 11. Google Business Profile (post setiap artikel)
+
+Setiap artikel yang terbit dipost ke profil Google pelanggan (ringkasan, gambar, butang
+"Ketahui lagi" ke artikel), 15 minit selepas terbit. Tiada panggilan AI. Ciri ini tutup selagi
+`GOOGLE_BUSINESS_CLIENT_ID` kosong.
+
+1. **Mohon akses API (sekali, tunggu kelulusan Google).** Halaman
+   developers.google.com/my-business/content/prereqs → borang permohonan akses. Guna projek
+   Google Cloud yang sama (catat *Project number*), e-mel yang mengurus profil yang sudah
+   disahkan, website `https://dynoseo.my`. Selagi belum lulus, kuota API = 0.
+2. **Enable API** (Cloud Console → APIs & Services → Library): *My Business Account Management
+   API*, *My Business Business Information API*, *Google My Business API*.
+3. **OAuth consent screen**: External, scope `.../auth/business.manage`. Tukar status ke
+   **In production** (dalam *Testing*, Google tamatkan sambungan setiap 7 hari). Amaran "app
+   belum disahkan" semasa Sambung Google boleh diterima, kerana hanya admin yang log masuk.
+4. **Credentials → Create OAuth client ID → Web application**. Authorized redirect URI:
+   `https://dynoseo.my/google/callback`. Isi `.env`: `GOOGLE_BUSINESS_CLIENT_ID`,
+   `GOOGLE_BUSINESS_CLIENT_SECRET`, kemudian `php artisan optimize`.
+5. App → **Website** → **Sambung Google** dengan akaun Google admin.
+6. Setiap pelanggan: dalam profil Google mereka → *People and access* → tambah akaun Google
+   admin sebagai **Manager**.
+7. App → Website → **Edit** → pilih **Profil Google**. Artikel seterusnya dipost sendiri; artikel
+   lama boleh dipost dengan butang **Post ke Google** di skrin Artikel.
+
+Ralat Google (contoh akses belum diluluskan) dipapar pada artikel di skrin Artikel; laman web
+dan artikel tidak terjejas.
+
 ## 10. Sebelum 1 Disember 2026
 
 Putuskan sama ada upgrade akaun GCP (kos sebenar ± RM6 setiap website sebulan) atau tukar

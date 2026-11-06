@@ -28,6 +28,12 @@
                     @if ($article->word_count) · {{ $article->word_count }} perkataan @endif
                 </p>
 
+                @if ($article->gbp_posted_at)
+                    <p class="mt-1 text-xs text-emerald-700">Dipost ke Google {{ $article->gbp_posted_at->format('d/m H:i') }}</p>
+                @elseif ($article->gbp_error)
+                    <p class="mt-1 rounded-lg bg-amber-50 p-2 text-xs text-amber-900">Google: {{ $article->gbp_error }}</p>
+                @endif
+
                 @if ($article->status === \App\Enums\ArticleStatus::Failed)
                     <div class="mt-2 rounded-xl bg-rose-50 p-2.5 text-xs text-rose-800">
                         {{ $article->error }}
@@ -56,6 +62,9 @@
                         @if (in_array($article->status, [\App\Enums\ArticleStatus::Published, \App\Enums\ArticleStatus::Ready]))
                             <button wire:click="startEdit({{ $article->id }})" class="btn-soft px-3 py-2"><x-icon name="pencil" class="h-4 w-4" /> Edit</button>
                             <button wire:click="regenerateImage({{ $article->id }})" wire:confirm="Jana gambar baru (kos satu gambar AI)?" class="btn-soft px-3 py-2" wire:loading.attr="disabled"><x-icon name="refresh" class="h-4 w-4" /> Gambar baru</button>
+                        @endif
+                        @if ($article->status === \App\Enums\ArticleStatus::Published && ! $article->gbp_posted_at && $article->site->gbp_location && $googleConfigured)
+                            <button wire:click="postToGoogle({{ $article->id }})" class="btn-soft px-3 py-2" wire:loading.attr="disabled">Post ke Google</button>
                         @endif
                         @if ($article->status === \App\Enums\ArticleStatus::Ready)
                             <button wire:click="publish({{ $article->id }})" class="btn-primary px-3 py-2" wire:loading.attr="disabled">Terbit sekarang</button>

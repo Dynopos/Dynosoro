@@ -17,6 +17,32 @@
         </x-alert>
     @endif
 
+    @if ($googleFlash)
+        <x-alert :type="$googleFlash[1]">{{ $googleFlash[0] }}</x-alert>
+    @endif
+
+    {{-- Google Business Profile: one post per article. Hidden until the OAuth client is set in .env. --}}
+    @if ($googleConfigured && ! $showForm)
+        <div class="card flex items-center justify-between gap-3 p-4 text-sm">
+            <div class="min-w-0">
+                <p class="font-semibold">Post ke Google Business Profile</p>
+                @if ($googleConnection)
+                    <p class="truncate text-xs text-slate-600">Disambung{{ $googleConnection->email ? ' sebagai '.$googleConnection->email : '' }}. Setiap artikel baru dipost ke profil Google website itu.</p>
+                @else
+                    <p class="text-xs text-slate-600">Sambung akaun Google yang menjadi Manager profil pelanggan.</p>
+                @endif
+            </div>
+            @if ($googleConnection)
+                <form method="POST" action="{{ route('google.disconnect') }}" onsubmit="return confirm('Putuskan Google? Artikel baru tidak akan dipost ke Google.')">
+                    @csrf
+                    <button type="submit" class="btn-soft shrink-0 px-3 py-2">Putus</button>
+                </form>
+            @else
+                <a href="{{ route('google.connect') }}" class="btn-primary shrink-0 px-3 py-2">Sambung Google</a>
+            @endif
+        </div>
+    @endif
+
     @if ($tokenExpires && $tokenExpires->lte(now()->addDays(config('dynoseo.github.warn_days'))))
         <x-alert type="warning">Token GitHub tamat {{ $tokenExpires->format('d/m/Y') }}. Buat token baru dan kemas kini .env.</x-alert>
     @endif
@@ -61,6 +87,21 @@
                     <x-field label="Topik dilarang" name="form.banned_topics" hint="Pisahkan dengan koma.">
                         <input type="text" wire:model="form.banned_topics" class="input" placeholder="harga, nama pesaing">
                     </x-field>
+                    @if ($googleConfigured)
+                        <x-field label="Profil Google (post setiap artikel)" name="form.gbp_location" hint="Akaun Google yang disambung mesti Manager profil ini.">
+                            @if ($gbpLocations)
+                                <select wire:model="form.gbp_location" class="input">
+                                    <option value="">Tidak dipost ke Google</option>
+                                    @foreach ($gbpLocations as $location)
+                                        <option value="{{ $location['name'] }}">{{ $location['title'] }}{{ $location['address'] ? ' ('.$location['address'].')' : '' }}</option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <p class="text-xs text-slate-600">{{ $gbpError ?? 'Sambung Google dahulu (kad di atas senarai website), kemudian Edit website ini.' }}</p>
+                                @if ($form['gbp_title'] ?? '')<p class="text-xs">Sekarang: {{ $form['gbp_title'] }}</p>@endif
+                            @endif
+                        </x-field>
+                    @endif
                     <x-field label="Keyword sasaran (maksimum 5)" name="form.target_keywords" hint="Satu keyword setiap baris. Setiap satu dapat artikel dahulu, sebelum topik lain.">
                         <textarea wire:model="form.target_keywords" rows="3" class="input" placeholder="sistem pos kedai runcit&#10;sistem pos kelantan"></textarea>
                     </x-field>
@@ -137,6 +178,7 @@
                     <p class="mt-2 text-sm"><b>{{ $a['field'] }}</b>: {{ $a['summary'] }}</p>
                     @if ($a['services'])<p class="mt-1.5 text-xs text-slate-600"><b>Perkhidmatan:</b> {{ implode(', ', $a['services']) }}</p>@endif
                     <p class="mt-1.5 text-xs text-slate-600"><b>Kluster topik:</b> {{ collect($a['pillars'])->pluck('name')->implode(' · ') }}</p>
+                    @if ($site->gbp_title)<p class="mt-1.5 text-xs text-slate-600"><b>Google:</b> {{ $site->gbp_title }}</p>@endif
                     @if ($site->targetKeywords())<p class="mt-1.5 text-xs text-slate-600"><b>Keyword sasaran:</b> {{ implode(' · ', $site->targetKeywords()) }}</p>@endif
                     @if ($a['avoid'])<p class="mt-1.5 text-xs text-rose-700"><b>Tak akan ditulis:</b> {{ implode(', ', $a['avoid']) }}</p>@endif
                     @if ($a['confidence'] !== 'tinggi' && $a['question'])

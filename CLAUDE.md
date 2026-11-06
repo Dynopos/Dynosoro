@@ -66,7 +66,7 @@ Ditulis dalam kod, bukan diharap AI ingat. Setiap satu perlukan test.
   Kod, nama jadual dan komen: English.
 - Logik dalam service classes (`app/Services/...`), bukan dalam komponen Livewire.
 - Semua panggilan luar melalui satu client class setiap satu (`VertexClient`,
-  `GitHubClient`, `IndexNowClient`) supaya senang di-mock.
+  `GitHubClient`, `IndexNowClient`, `GoogleBusinessClient`) supaya senang di-mock.
 - Prompt dalam `resources/prompts/*.md` dengan `prompt_version`.
 - Nombor WhatsApp hook: `01x...` ditukar ke `601x...` untuk `wa.me`.
 

@@ -57,6 +57,15 @@ return [
         'timeout' => 60,
     ],
 
+    // Google Business Profile API (OAuth client of the same Google Cloud project). Empty = the
+    // feature is off: no button, no calls. Access must be approved by Google first.
+    'google_business' => [
+        'client_id' => env('GOOGLE_BUSINESS_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_BUSINESS_CLIENT_SECRET'),
+        'scope' => 'https://www.googleapis.com/auth/business.manage openid email',
+        'timeout' => 30,
+    ],
+
     'indexnow' => [
         'endpoint' => 'https://api.indexnow.org/indexnow',
         'timeout' => 15,

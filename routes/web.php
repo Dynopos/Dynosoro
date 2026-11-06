@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GoogleConnectionController;
 use App\Livewire\ArticlesPage;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
@@ -84,4 +85,9 @@ Route::middleware(['auth', 'workspace', 'admin'])->group(function () {
     Route::get('/website/{siteId}/topik', TopicsPage::class)->name('topics');
     Route::get('/artikel', ArticlesPage::class)->name('articles');
     Route::get('/kos', CostsPage::class)->name('costs');
+
+    // Google Business Profile (posts per article). Off until the OAuth client is configured.
+    Route::get('/google/sambung', [GoogleConnectionController::class, 'connect'])->name('google.connect');
+    Route::get('/google/callback', [GoogleConnectionController::class, 'callback'])->name('google.callback');
+    Route::post('/google/putus', [GoogleConnectionController::class, 'disconnect'])->name('google.disconnect');
 });
