@@ -4,7 +4,9 @@ namespace App\Services\Sites;
 
 use App\Enums\SiteStatus;
 use App\Jobs\PublishSiteArticle;
+use App\Jobs\SetUpBing;
 use App\Models\Site;
+use App\Services\Bing\BingSetup;
 use App\Services\Publishing\GitHubClient;
 use App\Services\Publishing\SitePublisher;
 use App\Support\MalaysianPhone;
@@ -18,6 +20,7 @@ class SiteService
     public function __construct(
         private GitHubClient $github,
         private SitePublisher $publisher,
+        private BingSetup $bing,
     ) {}
 
     public static function rules(): array
@@ -211,7 +214,7 @@ class SiteService
 
         try {
             if (! $site->installed_at) {
-                $this->publisher->install($site);
+                $this->install($site);
             }
         } catch (Throwable $e) {
             report($e);
@@ -229,9 +232,47 @@ class SiteService
         return null;
     }
 
+    /** Install the blog; with the Bing API key, Bing setup follows once the website has deployed. */
     public function install(Site $site): void
     {
         $this->publisher->install($site);
+        $this->queueBing($site, true);
+    }
+
+    /**
+     * Bing Webmaster Tools from the website card: commit BingSiteAuth.xml if it is missing, then
+     * (with the API key) add, verify and submit the sitemap in the background. Returns a message in BM.
+     */
+    public function setUpBing(Site $site): string
+    {
+        $committed = $this->publisher->installBingAuth($site);
+
+        if ($this->queueBing($site, $committed)) {
+            return $committed
+                ? 'BingSiteAuth.xml di-commit. Website akan didaftar di Bing selepas '.(int) config('dynoseo.bing.setup_delay_minutes', 15).' minit (masa untuk deploy).'
+                : 'Website sedang didaftar di Bing. Semak kad ini sebentar lagi.';
+        }
+
+        if ($site->bing_verified_at !== null && $site->bing_sitemap_at !== null) {
+            return 'Bing sudah siap: website disahkan dan sitemap dihantar.';
+        }
+
+        return $committed
+            ? 'BingSiteAuth.xml di-commit. Tambah website ini di bing.com/webmasters dan tekan Verify (kaedah XML File).'
+            : 'BingSiteAuth.xml sudah ada. Tambah website ini di bing.com/webmasters dan tekan Verify (kaedah XML File).';
+    }
+
+    /** Queue the Bing setup when the API key is set and something is left to do. */
+    private function queueBing(Site $site, bool $afterDeploy): bool
+    {
+        if (! $this->bing->due($site)) {
+            return false;
+        }
+
+        SetUpBing::dispatch($site->id)
+            ->delay($afterDeploy ? now()->addMinutes((int) config('dynoseo.bing.setup_delay_minutes', 15)) : null);
+
+        return true;
     }
 
     public function activate(Site $site): void

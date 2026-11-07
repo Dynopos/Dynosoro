@@ -16,6 +16,7 @@ class Site extends Model
 
     protected $fillable = [
         'name', 'domain', 'github_repo', 'branch', 'docroot', 'niche', 'audience', 'area', 'banned_topics', 'target_keywords', 'gbp_location', 'gbp_title', 'analysis',
+        'bing_verified_at', 'bing_sitemap_at', 'bing_error',
         'frequency_days', 'status', 'status_note', 'failure_count', 'next_publish_at',
         'last_published_at', 'paid_until', 'cta', 'cta_bridge', 'installed_at', 'blog_pages',
     ];
@@ -32,6 +33,8 @@ class Site extends Model
             'next_publish_at' => 'datetime',
             'last_published_at' => 'datetime',
             'installed_at' => 'datetime',
+            'bing_verified_at' => 'datetime',
+            'bing_sitemap_at' => 'datetime',
             'analysis' => 'array',
             'target_keywords' => 'array',
             'analysis_confirmed_at' => 'datetime',
@@ -112,6 +115,12 @@ class Site extends Model
         $docroot = trim((string) $this->docroot, '/');
 
         return $docroot === '' || str_starts_with($path, '_dynoseo/') ? $path : $docroot.'/'.$path;
+    }
+
+    /** The sitemap search engines should read: the index the app manages, or the blog's own for a Laravel app. */
+    public function sitemapUrl(): string
+    {
+        return $this->baseUrl().($this->ownsRootFiles() ? '/sitemap.xml' : '/blog/sitemap.xml');
     }
 
     /** GitHub Pages: the repo root is the web root, so sitemap.xml and robots.txt are files we may manage. */

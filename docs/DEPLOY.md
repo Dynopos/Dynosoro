@@ -170,8 +170,10 @@ user `forge`, **Every Minute**.
 7. **Aktifkan**. Artikel pertama ditulis dalam 15 minit, kemudian setiap 2 hari pada waktu
    rawak 8 pagi – 9 malam. **Terbit sekarang** untuk ujian segera.
 8. Google: tambah domain di Google Search Console dan hantar `https://domain/sitemap.xml`.
-9. Bing (sumber utama ChatGPT): bing.com/webmasters → tambah domain (paling mudah: *Import from
-   Google Search Console*) → hantar sitemap yang sama.
+9. Bing (sumber utama ChatGPT): lihat §12. Dengan `BING_SITE_AUTH` dan `BING_WEBMASTER_API_KEY`
+   diisi, app pasang `BingSiteAuth.xml`, daftar website di Bing, sahkan dan hantar sitemap sendiri
+   (15 minit selepas Pasang blog). Kad website tunjuk "Bing: disahkan". Untuk website lama, tekan
+   **Daftar Bing** pada kad.
 10. IndexNow (Bing diberitahu serta-merta bila artikel terbit): isi `INDEXNOW_KEY` sekali sahaja
     (lihat langkah 3), kemudian tekan **Pasang blog** semula untuk setiap website supaya fail
     kunci di-commit.
@@ -228,3 +230,28 @@ dan artikel tidak terjejas.
 
 Putuskan sama ada upgrade akaun GCP (kos sebenar ± RM6 setiap website sebulan) atau tukar
 pembekal AI. Tanpa upgrade, artikel berhenti bila kredit habis atau pada 5 Januari 2027.
+
+## 12. Bing Webmaster Tools (setiap website)
+
+Bing ialah sumber carian utama ChatGPT dan Copilot. App sediakan dua tahap; kedua-duanya tutup
+selagi `.env` kosong.
+
+1. **Kod pengesahan (sekali).** bing.com/webmasters → tambah mana-mana satu website →
+   kaedah **XML File** → muat turun `BingSiteAuth.xml`. Salin kod dalam `<user>...</user>` ke
+   `BING_SITE_AUTH`. Kod ini sama untuk semua website dalam akaun Bing yang sama.
+   Selepas `php artisan optimize`, setiap **Pasang blog** dan **Bina semula** commit
+   `BingSiteAuth.xml` ke website (di `public/` untuk app Laravel). Fail milik pemilik yang sudah
+   ada tidak diubah.
+2. **API (pilihan, automatik penuh).** Bing Webmaster → ikon tetapan → **API access** →
+   **API Key** → *Generate*. Isi `BING_WEBMASTER_API_KEY`, kemudian `php artisan optimize`.
+   Selepas Pasang blog (atau tekan **Daftar Bing**), app tunggu `BING_SETUP_DELAY_MINUTES`
+   (lalai 15) supaya website sempat deploy, kemudian: tambah website ke akaun Bing → sahkan
+   (`BingSiteAuth.xml`) → hantar `sitemap.xml` (atau `/blog/sitemap.xml` untuk app Laravel).
+   Sekali sahaja setiap website. Tiada panggilan AI.
+3. Tanpa API: tekan **Daftar Bing** (commit fail jika belum ada), kemudian di bing.com/webmasters
+   → *Add site* → `https://domain/` → **XML File** → **Verify**, dan hantar sitemap.
+
+Ralat Bing dipapar pada kad website (contoh "Bing belum dapat sahkan"); tekan **Daftar Bing**
+untuk cuba semula. Jika Bing tunjuk "Unexpected error occurred" di laman webnya, itu masalah
+sementara Bing; cuba lagi kemudian atau guna *Import from Google Search Console*.
+

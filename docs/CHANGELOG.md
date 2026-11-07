@@ -1,5 +1,18 @@
 # Changelog
 
+## Bing Webmaster Tools — 2026-11-07
+
+- **BingSiteAuth.xml** (kod akaun Bing admin, `BING_SITE_AUTH`) di-commit ke setiap website semasa
+  Pasang blog dan Bina semula (di `public/` untuk app Laravel). Fail pemilik sedia ada tidak
+  diubah (peraturan 5). `RepoGuard` benarkan fail ini hanya bila kod diisi.
+- **Daftar Bing automatik** dengan `BING_WEBMASTER_API_KEY`: 15 minit selepas Pasang blog, app
+  tambah website ke akaun Bing, sahkan, dan hantar sitemap. Sekali sahaja; tiada panggilan AI.
+  Semua panggilan melalui `BingWebmasterClient`. Belum diuji dengan Bing sebenar.
+- Kad website: "Bing: disahkan dd/mm, sitemap dihantar", ralat Bing, dan butang **Daftar Bing**
+  (website lama, atau cuba semula). Ciri tutup selagi kedua-dua tetapan kosong.
+- Pakej Dyno SEO kini: artikel ke website, post ke Google Business Profile, GEO (llms.txt, bot AI
+  dalam robots.txt, schema) dan Bing Webmaster Tools.
+
 ## Google Business Profile — 2026-11-05
 
 - **Post ke Google** untuk setiap artikel yang terbit: ringkasan artikel, gambar, butang

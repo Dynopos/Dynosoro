@@ -71,4 +71,12 @@ return [
         'timeout' => 15,
     ],
 
+    // Bing Webmaster Tools API (Settings → API access in the admin's Bing account). Empty = the
+    // app only commits BingSiteAuth.xml; the admin adds and verifies each website by hand.
+    'bing_webmaster' => [
+        'api_key' => env('BING_WEBMASTER_API_KEY'),
+        'base_url' => 'https://ssl.bing.com/webmaster/api.svc/json',
+        'timeout' => 30,
+    ],
+
 ];

@@ -6,6 +6,7 @@ use App\Enums\SiteStatus;
 use App\Exceptions\GoogleBusinessException;
 use App\Models\GoogleConnection;
 use App\Models\Site;
+use App\Services\Bing\BingWebmasterClient;
 use App\Services\Content\SiteAnalyst;
 use App\Services\Content\TopicPlanner;
 use App\Services\Google\GoogleBusinessClient;
@@ -124,6 +125,16 @@ class SitesPage extends Component
     public function install(SiteService $sites, int $id): void
     {
         $this->attempt(fn () => $sites->install(Site::query()->findOrFail($id)), 'Blog dipasang: template, sitemap dan robots.txt dah di-commit.');
+    }
+
+    public function bing(SiteService $sites, int $id): void
+    {
+        try {
+            $this->say($sites->setUpBing(Site::query()->findOrFail($id)));
+        } catch (Throwable $e) {
+            report($e);
+            $this->say($e->getMessage(), 'danger');
+        }
     }
 
     public function activate(SiteService $sites, int $id): void
@@ -269,6 +280,7 @@ class SitesPage extends Component
             'tokenExpires' => $expires ? Carbon::parse($expires) : null,
             'googleConfigured' => app(GoogleBusinessClient::class)->configured(),
             'googleConnection' => GoogleConnection::query()->first(),
+            'bingReady' => app(BingWebmasterClient::class)->configured() || filled(config('dynoseo.bing.site_auth')),
             'googleFlash' => session('google_flash'),
         ]);
     }

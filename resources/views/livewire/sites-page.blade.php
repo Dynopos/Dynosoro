@@ -206,6 +206,12 @@
             @if ($site->status_note)
                 <p class="mt-3 rounded-xl bg-amber-50 p-2.5 text-xs text-amber-900">{{ $site->status_note }}</p>
             @endif
+            @if ($site->bing_verified_at)
+                <p class="mt-2 text-xs text-slate-600"><b>Bing:</b> disahkan {{ $site->bing_verified_at->format('d/m') }}{{ $site->bing_sitemap_at ? ', sitemap dihantar' : '' }}</p>
+            @endif
+            @if ($site->bing_error)
+                <p class="mt-2 rounded-xl bg-rose-50 p-2.5 text-xs text-rose-800"><b>Bing:</b> {{ $site->bing_error }}</p>
+            @endif
             @if ($site->paid_until)
                 <p class="mt-2 text-xs {{ $site->isPaid() ? 'text-slate-500' : 'font-semibold text-rose-600' }}">Bayar sehingga {{ $site->paid_until->format('d/m/Y') }}</p>
             @endif
@@ -219,6 +225,9 @@
                 @else
                     <button wire:click="publishNow({{ $site->id }})" wire:confirm="Tulis dan terbit satu artikel sekarang?" class="btn-soft px-3 py-2"><x-icon name="sparkles" class="h-4 w-4" /> Terbit sekarang</button>
                     <button wire:click="rebuild({{ $site->id }})" wire:confirm="Bina semula semua halaman blog (contoh selepas tukar hook)?" class="btn-soft px-3 py-2" wire:loading.attr="disabled"><x-icon name="refresh" class="h-4 w-4" /> Bina semula</button>
+                    @if ($bingReady && ! ($site->bing_verified_at && $site->bing_sitemap_at))
+                        <button wire:click="bing({{ $site->id }})" class="btn-soft px-3 py-2" wire:loading.attr="disabled" wire:target="bing({{ $site->id }})">Daftar Bing</button>
+                    @endif
                 @endif
                 @if ($site->status === \App\Enums\SiteStatus::Active)
                     <button wire:click="pause({{ $site->id }})" class="btn-soft px-3 py-2">Henti</button>

@@ -151,3 +151,17 @@ Catat setiap keputusan reka bentuk di sini (tarikh, keputusan, sebab).
   bidang lebih penting daripada kos. `GitHubClient` hanya dibaca (`getFile`) oleh `SiteAnalyst`.
 - Padanan kluster dalam kod longgar (normalisasi `Topic::keyFor`, padanan sebahagian) supaya
   variasi kecil nama kluster dari AI tidak membuang topik yang betul.
+
+## 2026-11-07 — Bing Webmaster Tools
+
+- **Satu kod untuk semua website.** Bing beri satu kod `BingSiteAuth.xml` bagi setiap akaun, jadi
+  kod disimpan dalam `.env` (`BING_SITE_AUTH`), bukan setiap website. Kaedah fail XML dipilih
+  kerana app sudah commit ke repo website; tiada perubahan DNS atau laman utama diperlukan.
+- **Fail pemilik tidak disentuh.** Jika `BingSiteAuth.xml` sudah wujud (walaupun kod akaun lain),
+  app tidak menulis ganti; pengesahan API akan gagal dengan mesej yang jelas pada kad.
+- **API pilihan.** Tanpa `BING_WEBMASTER_API_KEY`, Bob daftar dan Verify sendiri di Bing. Dengan
+  kunci, app daftar, sahkan dan hantar sitemap sekali, ditangguh 15 minit selepas Pasang blog
+  supaya GitHub Pages sempat deploy. Job `tries = 1`; ralat disimpan pada website, cuba semula
+  dengan butang Daftar Bing (tiada loop).
+- IndexNow kekal untuk setiap artikel; sitemap dihantar ke Bing sekali sahaja.
+

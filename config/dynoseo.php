@@ -73,6 +73,14 @@ return [
 
     'indexnow_key' => env('INDEXNOW_KEY'),
 
+    // Bing Webmaster Tools. site_auth: the code in the admin's BingSiteAuth.xml (the same for
+    // every website in one Bing account); the app commits that file to each website. The API
+    // (services.bing_webmaster) then adds, verifies and submits the sitemap after the website deploys.
+    'bing' => [
+        'site_auth' => env('BING_SITE_AUTH'),
+        'setup_delay_minutes' => (int) env('BING_SETUP_DELAY_MINUTES', 15),
+    ],
+
     // Google Business Profile: one post per published article. The delay lets the website
     // deploy first, so the article link and image already work when Google fetches them.
     'gbp' => [

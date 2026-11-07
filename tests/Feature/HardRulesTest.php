@@ -206,7 +206,7 @@ it('ships .env.example with names only for secrets', function () {
         ->filter(fn ($line) => str_contains($line, '=') && ! str_starts_with($line, '#'))
         ->mapWithKeys(fn ($line) => [strstr($line, '=', true) => substr(strstr($line, '='), 1)]);
 
-    foreach (['APP_KEY', 'DB_PASSWORD', 'MAIL_PASSWORD', 'GITHUB_TOKEN', 'VERTEX_ACCESS_TOKEN', 'GOOGLE_APPLICATION_CREDENTIALS', 'GOOGLE_CREDENTIALS_BASE64', 'INDEXNOW_KEY', 'GCP_PROJECT_ID'] as $key) {
+    foreach (['APP_KEY', 'DB_PASSWORD', 'MAIL_PASSWORD', 'GITHUB_TOKEN', 'VERTEX_ACCESS_TOKEN', 'GOOGLE_APPLICATION_CREDENTIALS', 'GOOGLE_CREDENTIALS_BASE64', 'INDEXNOW_KEY', 'GCP_PROJECT_ID', 'BING_WEBMASTER_API_KEY'] as $key) {
         expect($env[$key] ?? null)->toBe('', $key);
     }
 

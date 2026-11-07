@@ -8,6 +8,7 @@ arch('only the API clients use the HTTP client')
         'App\Services\Publishing\GitHubClient',
         'App\Services\Publishing\IndexNowClient',
         'App\Services\Google\GoogleBusinessClient',
+        'App\Services\Bing\BingWebmasterClient',
     ]);
 
 // AiGateway checks AiBudget::assertCanSpend() and records ai_usage around every call (rule 4).

@@ -29,6 +29,10 @@ class RepoGuard
             return true;
         }
 
+        if ($path === SitePublisher::BING_AUTH_FILE && filled(config('dynoseo.bing.site_auth'))) {
+            return true;
+        }
+
         return preg_match('#^(blog|_dynoseo)/[A-Za-z0-9._/-]+$#', $path) === 1;
     }
 

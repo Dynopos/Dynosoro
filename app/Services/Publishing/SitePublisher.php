@@ -30,6 +30,9 @@ class SitePublisher
         ."User-agent: Google-Extended\nUser-agent: PerplexityBot\n"
         ."User-agent: ClaudeBot\nUser-agent: Claude-SearchBot\nAllow: /\n";
 
+    /** Bing Webmaster Tools verification file, at the web root. */
+    public const BING_AUTH_FILE = 'BingSiteAuth.xml';
+
     /** index.html as read for this commit, so RepoGuard can check only the block changed. */
     private ?string $originalHome = null;
 
@@ -39,7 +42,7 @@ class SitePublisher
         private IndexNowClient $indexNow,
     ) {}
 
-    /** One-off setup: templates, CSS, sitemap index, robots.txt, IndexNow key file. */
+    /** One-off setup: templates, CSS, sitemap index, robots.txt, IndexNow key and Bing verification files. */
     public function install(Site $site): string
     {
         $files = [];
@@ -62,6 +65,7 @@ class SitePublisher
             $files[$key.'.txt'] = $key;
         }
 
+        $files += $this->bingAuthFile($site);
         $files += $this->listingFiles($site, SiteTemplates::load($site, $this->github), $this->published($site));
 
         $sha = $this->commit($site, null, 'install', $files, 'Dyno SEO: pasang blog');
@@ -180,7 +184,7 @@ class SitePublisher
     {
         $templates = SiteTemplates::load($site, $this->github);
         $published = $this->published($site);
-        $files = ['blog/assets/dynoseo.css' => SiteTemplates::css()];
+        $files = ['blog/assets/dynoseo.css' => SiteTemplates::css()] + $this->bingAuthFile($site);
 
         foreach ($published as $article) {
             $files += $this->articleFiles($site, $article, $templates, $published);
@@ -189,6 +193,42 @@ class SitePublisher
         $files += $this->listingFiles($site, $templates, $published);
 
         return $this->commit($site, null, 'rebuild', $files, 'Dyno SEO: bina semula blog');
+    }
+
+    /**
+     * Commit only BingSiteAuth.xml, for a website installed before the Bing code was set.
+     * Returns false when there was nothing to commit (no code, or the file is already there).
+     */
+    public function installBingAuth(Site $site): bool
+    {
+        $files = $this->bingAuthFile($site);
+
+        if ($files === []) {
+            return false;
+        }
+
+        $this->commit($site, null, 'bing', $files, 'Dyno SEO: pengesahan Bing Webmaster');
+
+        return true;
+    }
+
+    /**
+     * BingSiteAuth.xml with the admin's Bing code, when the website has none. A file the owner
+     * already has (even with another Bing account's code) is never overwritten (rule 5).
+     *
+     * @return array<string, string>
+     */
+    private function bingAuthFile(Site $site): array
+    {
+        $code = trim((string) config('dynoseo.bing.site_auth'));
+
+        if ($code === '' || $this->github->getFile($site->github_repo, $site->branch, $site->repoPath(self::BING_AUTH_FILE)) !== null) {
+            return [];
+        }
+
+        $code = htmlspecialchars($code, ENT_XML1);
+
+        return [self::BING_AUTH_FILE => "<?xml version=\"1.0\"?>\n<users>\n\t<user>{$code}</user>\n</users>\n"];
     }
 
     private function writeArticle(Site $site, Article $article, string $action, string $message): string
